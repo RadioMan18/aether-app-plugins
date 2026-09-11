@@ -29,38 +29,38 @@ $$\text{Weight} = \text{Estimated Hours} \times \text{Complexity Factor} \times 
 
 | Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Prerequisites | AIDLC Phase |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **T1** | Tauri Host Setup & Fluent UI Shell | 12 | 1.5 | 1.0 | **18.00** | None | 🔵 Inception |
-| **T2** | SQLCipher Database Integration | 16 | 2.0 | 1.8 | **57.60** | None | 🟢 Construction |
-| **T3** | Windows Hello Biometric Integration | 14 | 2.2 | 2.0 | **61.60** | None | 🟢 Construction |
-| **T4** | Secure Key Release & DB Decryption | 10 | 2.0 | 1.5 | **30.00** | T2, T3 | 🟢 Construction |
-| **T5** | Custom URI Scheme & Sandboxed Iframe | 15 | 2.5 | 1.5 | **56.25** | T1 | 🟢 Construction |
-| **T6** | Secure IPC Bridge & Data Broker | 20 | 2.5 | 1.8 | **90.00** | T5 | 🟢 Construction |
-| **T7** | Plugin Installer & Manager | 12 | 1.8 | 1.2 | **25.92** | T1, T2 | 🟢 Construction |
-| **T8** | Core Plugin SDK & React Template | 10 | 1.5 | 1.2 | **18.00** | T6 | 🟢 Construction |
-| **T9** | Journaling Plugin (Encrypted) | 16 | 1.8 | 1.2 | **34.56** | T4, T8 | 🟢 Construction |
-| **T10** | Todo List Plugin | 10 | 1.2 | 1.0 | **12.00** | T8 | 🟢 Construction |
-| **T11** | Goals Tracker Plugin (Data Sharing) | 14 | 2.0 | 1.5 | **42.00** | T8, T10 | 🟢 Construction |
-| **T12** | Windows Installer Packaging (NSIS) | 8 | 1.5 | 1.2 | **14.40** | T7, T9, T11 | 🟡 Operations |
+| **TSK-001** | Tauri Host Setup & Fluent UI Shell | 12 | 1.5 | 1.0 | **18.00** | None | 🔵 Inception |
+| **TSK-002** | SQLCipher Database Integration | 16 | 2.0 | 1.8 | **57.60** | None | 🟢 Construction |
+| **TSK-003** | Windows Hello Biometric Integration | 14 | 2.2 | 2.0 | **61.60** | None | 🟢 Construction |
+| **TSK-004** | Secure Key Release & DB Decryption | 10 | 2.0 | 1.5 | **30.00** | TSK-002, TSK-003 | 🟢 Construction |
+| **TSK-005** | Custom URI Scheme & Sandboxed Iframe | 15 | 2.5 | 1.5 | **56.25** | TSK-001 | 🟢 Construction |
+| **TSK-006** | Secure IPC Bridge & Data Broker | 20 | 2.5 | 1.8 | **90.00** | TSK-005 | 🟢 Construction |
+| **TSK-007** | Plugin Installer & Manager | 12 | 1.8 | 1.2 | **25.92** | TSK-001, TSK-002 | 🟢 Construction |
+| **TSK-008** | Core Plugin SDK & React Template | 10 | 1.5 | 1.2 | **18.00** | TSK-006 | 🟢 Construction |
+| **TSK-009** | Journaling Plugin (Encrypted) | 16 | 1.8 | 1.2 | **34.56** | TSK-004, TSK-008 | 🟢 Construction |
+| **TSK-010** | Todo List Plugin | 10 | 1.2 | 1.0 | **12.00** | TSK-008 | 🟢 Construction |
+| **TSK-011** | Goals Tracker Plugin (Data Sharing) | 14 | 2.0 | 1.5 | **42.00** | TSK-008, TSK-010 | 🟢 Construction |
+| **TSK-012** | Windows Installer Packaging (NSIS) | 8 | 1.5 | 1.2 | **14.40** | TSK-007, TSK-009, TSK-011 | 🟡 Operations |
 
 ### Dependency Graph (DAG)
 
 ```mermaid
 graph TD
-    T1[T1: Tauri Host Setup] --> T5[T5: Custom URI Scheme]
-    T1 --> T7[T7: Plugin Installer]
-    T2[T2: SQLCipher Integration] --> T4[T4: Secure Key Release]
-    T2 --> T7
-    T3[T3: Windows Hello Integration] --> T4
-    T5 --> T6[T6: Secure IPC Bridge]
-    T6 --> T8[T8: Plugin SDK]
-    T4 --> T9[T9: Journaling Plugin]
-    T8 --> T9
-    T8 --> T10[T10: Todo List Plugin]
-    T8 --> T11[T11: Goals Tracker]
-    T10 --> T11
-    T7 --> T12[T12: Windows Installer]
-    T9 --> T12
-    T11 --> T12
+    TSK-001[TSK-001: Tauri Host Setup] --> TSK-005[TSK-005: Custom URI Scheme]
+    TSK-001 --> TSK-007[TSK-007: Plugin Installer]
+    TSK-002[TSK-002: SQLCipher Integration] --> TSK-004[TSK-004: Secure Key Release]
+    TSK-002 --> TSK-007
+    TSK-003[TSK-003: Windows Hello Integration] --> TSK-004
+    TSK-005 --> TSK-006[TSK-006: Secure IPC Bridge]
+    TSK-006 --> TSK-008[TSK-008: Plugin SDK]
+    TSK-004 --> TSK-009[TSK-009: Journaling Plugin]
+    TSK-008 --> TSK-009
+    TSK-008 --> TSK-010[TSK-010: Todo List Plugin]
+    TSK-008 --> TSK-011[TSK-011: Goals Tracker]
+    TSK-010 --> TSK-011
+    TSK-007 --> TSK-012[TSK-012: Windows Installer]
+    TSK-009 --> TSK-012
+    TSK-011 --> TSK-012
 ```
 
 ---
@@ -71,23 +71,23 @@ graph TD
 
 The critical path represents the sequence of dependent tasks that determines the minimum possible duration of the project.
 
-$$\text{Critical Path: } \text{T1} \rightarrow \text{T5} \rightarrow \text{T6} \rightarrow \text{T8} \rightarrow \text{T10} \rightarrow \text{T11} \rightarrow \text{T12}$$
+$$\text{Critical Path: } \text{TSK-001} \rightarrow \text{TSK-005} \rightarrow \text{TSK-006} \rightarrow \text{TSK-008} \rightarrow \text{TSK-010} \rightarrow \text{TSK-011} \rightarrow \text{TSK-012}$$
 
 * **Total Weighted Duration:** **250.65 weighted hours** (approx. 89 actual development hours).
 * **Strategic Directive:** Tasks on this path have zero float. Any delay in the custom URI scheme, IPC bridge, or SDK directly delays the final release. These tasks must be prioritized during resource allocation.
 
 ### Parallel Tracks & Float (Slack)
 
-* **Biometrics & Database Track ($\text{T2}, \text{T3} \rightarrow \text{T4}$):** This track runs in parallel with the UI and Sandbox track. $\text{T4}$ has a float of **90.65 weighted hours**. This allows the complex integration of SQLCipher and Windows Hello to be thoroughly tested without impacting the critical path.
-* **Plugin Installer ($\text{T7}$):** This task has a float of **152.73 weighted hours**, allowing its implementation to be deferred until the core runtime is stable.
-* **Journaling Plugin ($\text{T9}$):** This task has a float of **19.44 weighted hours**, depending on the completion of the secure key release mechanism ($\text{T4}$).
+* **Biometrics & Database Track ($\text{TSK-002}, \text{TSK-003} \rightarrow \text{TSK-004}$):** This track runs in parallel with the UI and Sandbox track. $\text{TSK-004}$ has a float of **90.65 weighted hours**. This allows the complex integration of SQLCipher and Windows Hello to be thoroughly tested without impacting the critical path.
+* **Plugin Installer ($\text{TSK-007}$):** This task has a float of **152.73 weighted hours**, allowing its implementation to be deferred until the core runtime is stable.
+* **Journaling Plugin ($\text{TSK-009}$):** This task has a float of **19.44 weighted hours**, depending on the completion of the secure key release mechanism ($\text{TSK-004}$).
 
 ### Bottleneck Nodes
 
-* **$\text{T6}$ (Secure IPC Bridge):** Highest weight task (90.00) and critical gateway for all plugin communication.
-* **$\text{T8}$ (Plugin SDK):** Out-degree of 3. All core plugins depend on this SDK. The API contract must be frozen early to prevent downstream churn.
-* **$\text{T4}$ (Secure Key Release):** Merges biometrics and database security. It is a critical gatekeeper for the Journaling plugin ($\text{T9}$).
-* **$\text{T12}$ (Windows Installer Packaging):** Highest in-degree node on the critical path, requiring completion of Plugin Installer, Journaling, and Goals Tracker before packaging can begin.
+* **$\text{TSK-006}$ (Secure IPC Bridge):** Highest weight task (90.00) and critical gateway for all plugin communication.
+* **$\text{TSK-008}$ (Plugin SDK):** Out-degree of 3. All core plugins depend on this SDK. The API contract must be frozen early to prevent downstream churn.
+* **$\text{TSK-004}$ (Secure Key Release):** Merges biometrics and database security. It is a critical gatekeeper for the Journaling plugin ($\text{TSK-009}$).
+* **$\text{TSK-012}$ (Windows Installer Packaging):** Highest in-degree node on the critical path, requiring completion of Plugin Installer, Journaling, and Goals Tracker before packaging can begin.
 
 ---
 
@@ -260,29 +260,29 @@ The project will progress through structured execution phases. Human-in-the-Loop
 ### Phase 1: Core Infrastructure (🔵 Inception)
 
 * **Focus:** Establish the Tauri host, Fluent UI shell, and the custom URI scheme.
-* **Tasks:** T1, T5
+* **Tasks:** TSK-001, TSK-005
 * **HITL Gate 1:** Verify that the custom URI scheme successfully serves static assets into a sandboxed `iframe` without console security errors. Confirm `event.origin` behavior for `plugin://` iframes on Windows 11.
 
 ### Phase 2: Security & Storage (🟢 Construction)
 
 * **Focus:** Implement SQLCipher, Windows Hello integration, and the secure key release mechanism.
-* **Tasks:** T2, T3, T4
+* **Tasks:** TSK-002, TSK-003, TSK-004
 * **HITL Gate 2:** Verify that the database cannot be opened without a successful Windows Hello biometric challenge, and confirm that memory zeroization is functioning correctly. Confirm graceful degradation path works when Windows Hello is unavailable.
 
 ### Phase 3: Plugin Runtime & SDK (🟢 Construction)
 
 * **Focus:** Build the secure IPC bridge, the data sharing broker, and the Plugin SDK.
-* **Tasks:** T6, T7, T8
+* **Tasks:** TSK-006, TSK-007, TSK-008
 * **HITL Gate 3:** Audit the IPC bridge for potential prototype pollution or directory traversal vulnerabilities. Verify that unauthorized plugins cannot access the database.
 
 ### Phase 4: Plugin Implementation (🟢 Construction)
 
 * **Focus:** Develop the three core plugins using the SDK.
-* **Tasks:** T9, T10, T11
+* **Tasks:** TSK-009, TSK-010, TSK-011
 * **HITL Gate 4:** Verify that the Goals plugin can successfully query the Todo plugin's data via the host broker, and that the Journal plugin securely encrypts entries.
 
 ### Phase 5: Packaging & Release (🟡 Operations)
 
 * **Focus:** Package the application for Windows 11 distribution using a separate build script.
-* **Tasks:** T12
+* **Tasks:** TSK-012
 * **HITL Gate 5:** Perform a clean installation of the NSIS package on a target Windows 11 machine and verify end-to-end functionality (biometrics, plugin import, and local storage).

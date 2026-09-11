@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+target/
+dist/
+.cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Build outputs
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Tauri
+src-tauri/target/
+src-tauri/WixTools/
+src-tauri/*.log
+
+# Test coverage
+coverage/
+
+# Misc
+*.orig
+*.rej

@@ -4,7 +4,7 @@
 
 - **Active Branch:** `main`
 - **Current Phase:** 🔵 Inception
-- **Overall Completion:** 6%
+- **Overall Completion:** 12%
 
 ## 2. Task Board
 
@@ -13,7 +13,7 @@ Each task must be marked as `[ ]` (Todo), `[/]` (In Progress), or `[x]` (Complet
 ### 🔵 Inception
 
 - [x] TSK-001 (Est: 12h) — Design System Foundation (shadcn/ui + Tailwind + Theme Tokens)
-- [ ] TSK-002 (Est: 14h) — Three-Pane Shell: Activity Bar + Sidebar + Status Bar
+- [x] TSK-002 (Est: 14h) — Three-Pane Shell: Activity Bar + Sidebar + Status Bar
 - [ ] TSK-003 (Est: 10h) — Command Palette & Keyboard-First Navigation
 - [ ] TSK-004 (Est: 8h) — Plugin Store UI & Discovery Experience
 

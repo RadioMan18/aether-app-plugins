@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { ActivityBar } from "@/components/Shell/ActivityBar";
 import { Sidebar } from "@/components/Shell/Sidebar";
 import { MainContent } from "@/components/Shell/MainContent";
 import { StatusBar } from "@/components/Shell/StatusBar";
+import { useShellState } from "@/hooks/useShellState";
 import type { PluginManifest } from "@/types/plugin";
 
 const MOCK_PLUGINS: PluginManifest[] = [
@@ -33,18 +34,29 @@ const MOCK_PLUGINS: PluginManifest[] = [
 ];
 
 function App() {
-  const [activePluginId, setActivePluginId] = useState<string | null>(null);
+  const shell = useShellState(MOCK_PLUGINS);
+
+  const activePlugin = useMemo(
+    () => MOCK_PLUGINS.find((plugin) => plugin.id === shell.activePluginId) ?? null,
+    [shell.activePluginId]
+  );
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-canvas text-text-primary">
       <ActivityBar
         plugins={MOCK_PLUGINS}
-        activePluginId={activePluginId}
-        onPluginSelect={setActivePluginId}
+        activePluginId={shell.activePluginId}
+        onPluginSelect={shell.setActivePluginId}
       />
-      <Sidebar />
-      <MainContent />
-      <StatusBar />
+      <Sidebar
+        isOpen={shell.sidebarOpen}
+        isCompact={shell.isCompact}
+        onToggle={shell.toggleSidebar}
+        activePluginId={shell.activePluginId}
+        plugins={MOCK_PLUGINS}
+      />
+      <MainContent activePlugin={activePlugin} />
+      <StatusBar shell={shell} />
     </div>
   );
 }

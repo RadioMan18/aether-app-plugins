@@ -1,25 +1,65 @@
-import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import type { PluginManifest } from "@/types/plugin";
 
 interface MainContentProps {
-  className?: string;
-  children?: React.ReactNode;
+  activePlugin: PluginManifest | null;
 }
 
-export function MainContent({ className, children }: MainContentProps) {
+const MotionDiv = motion.div as React.ComponentType<
+  React.HTMLAttributes<HTMLDivElement> & {
+    initial?: { opacity: number; y?: number };
+    animate?: { opacity: number; y?: number };
+    exit?: { opacity: number; y?: number };
+    transition?: { duration: number; ease: string };
+  }
+>;
+
+export function MainContent({ activePlugin }: MainContentProps) {
   return (
-    <main className={cn("flex-1 overflow-y-auto scrollbar-thin bg-canvas", className)}>
-      {children ?? (
-        <div className="flex h-full items-center justify-center">
-          <div className="text-center">
-            <h1 className="mb-2 text-2xl font-semibold text-text-primary">
-              Welcome to Aether
-            </h1>
-            <p className="text-text-secondary">
-              Select a plugin from the Activity Bar to get started.
-            </p>
-          </div>
-        </div>
-      )}
+    <main className="flex-1 overflow-y-auto scrollbar-thin bg-canvas">
+      <AnimatePresence mode="wait">
+        {activePlugin ? (
+          <MotionDiv
+            key={activePlugin.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex h-full flex-col"
+          >
+            <div className="flex items-center gap-3 border-b border-border px-6 py-4">
+              <span className="text-2xl" role="img" aria-label={activePlugin.name}>
+                {activePlugin.icon}
+              </span>
+              <div>
+                <h1 className="text-xl font-semibold text-text-primary">{activePlugin.name}</h1>
+                <p className="text-sm text-text-secondary">v{activePlugin.version}</p>
+              </div>
+            </div>
+            <div className="flex-1 p-6">
+              <div className="rounded-lg border border-border bg-surface-1 p-6">
+                <p className="text-text-secondary">
+                  Plugin content for <span className="font-medium text-text-primary">{activePlugin.name}</span> will be
+                  rendered here.
+                </p>
+              </div>
+            </div>
+          </MotionDiv>
+        ) : (
+          <MotionDiv
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex h-full items-center justify-center"
+          >
+            <div className="text-center">
+              <h1 className="mb-2 text-2xl font-semibold text-text-primary">Welcome to Aether</h1>
+              <p className="text-text-secondary">Select a plugin from the Activity Bar to get started.</p>
+            </div>
+          </MotionDiv>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

@@ -31,3 +31,18 @@
 - Verified: TypeScript typecheck passes, Vite production build succeeds (1627 modules, 6.94s), ESLint passes with 0 errors
 - All source files under 400 lines (largest: components.tsx at 148 lines)
 - Added code size guardrail rule to AIDLC_STEERING.md
+
+## TSK-002 Completed: Three-Pane Shell
+
+**Timestamp**: 2026-09-12T00:52:00Z
+**Action**: Completed Three-Pane Shell task. Implemented interactive shell state management, Framer Motion animations, and responsive behavior.
+**Details**:
+- Created `src/hooks/useShellState.ts` for shell state management (active plugin, sidebar open/close, compact mode)
+- Updated `App.tsx` to use shell state hook and wire up all shell components
+- Enhanced `Sidebar.tsx` with Framer Motion AnimatePresence for smooth collapse/expand, dynamic section title based on active plugin, and collapse button
+- Enhanced `MainContent.tsx` with AnimatePresence transitions between plugin views and welcome screen
+- Updated `StatusBar.tsx` to show dynamic plugin count and compact mode indicator
+- Responsive behavior: sidebar auto-collapses at window width < 800px
+- Downgraded framer-motion from v12 to v11 to resolve build issues with motion-dom package
+- Verified: TypeScript typecheck passes, ESLint passes with 0 errors, Vite production build succeeds (1984 modules, 2.63s)
+- All source files under 400 lines (largest: components.tsx at 148 lines)

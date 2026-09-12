@@ -92,6 +92,39 @@ impl Database {
             .map_err(|e| format!("Failed to initialize schema: {}", e))?;
         Ok(())
     }
+
+    pub fn register_plugin(
+        &self,
+        id: &str,
+        name: &str,
+        version: &str,
+        permissions: &[String],
+    ) -> Result<(), String> {
+        self.with_connection(|conn| {
+            let permissions_json = serde_json::to_string(permissions)
+                .map_err(|e| format!("Failed to serialize permissions: {}", e))?;
+            conn.execute(
+                "INSERT OR REPLACE INTO plugins (id, name, version, permissions) VALUES (?1, ?2, ?3, ?4)",
+                rusqlite::params![id, name, version, permissions_json],
+            )
+            .map_err(|e| e.to_string())?;
+            Ok(())
+        })
+    }
+
+    pub fn get_plugin_permissions(&self, plugin_id: &str) -> Result<Vec<String>, String> {
+        self.with_connection(|conn| {
+            let mut stmt = conn
+                .prepare("SELECT permissions FROM plugins WHERE id = ?1")
+                .map_err(|e| e.to_string())?;
+            let permissions_json: String = stmt
+                .query_row(rusqlite::params![plugin_id], |row| row.get(0))
+                .map_err(|e| e.to_string())?;
+            let permissions: Vec<String> =
+                serde_json::from_str(&permissions_json).map_err(|e| e.to_string())?;
+            Ok(permissions)
+        })
+    }
 }
 
 struct CredentialManager;

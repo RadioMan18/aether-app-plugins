@@ -171,3 +171,27 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2003 modules)
 - All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
 
+## TSK-010 Completed: Secure IPC Bridge & Permission-Gated Data Broker
+
+**Timestamp**: 2026-09-12T19:45:00Z
+**Action**: Completed Secure IPC Bridge & Permission-Gated Data Broker task. Built postMessage IPC bridge between sandboxed plugin iframes and Tauri backend, with permission-gated database access.
+**Details**:
+- Created `src-tauri/src/ipc.rs` with `PluginRequest`, `PluginResponse`, and `PluginBroker`
+- `PluginBroker::handle` validates plugin permissions before routing requests
+- Implemented `db:query` handler that only allows SELECT statements (read-only)
+- Implemented `db:execute` handler that requires `db:write` permission
+- Added `plugins` table to `src-tauri/src/schema.sql` for plugin registry
+- Added `Database::register_plugin` and `Database::get_plugin_permissions` methods
+- Added `register_plugin` and `plugin_ipc` Tauri commands in `commands.rs`
+- Registered `ipc` module in `lib.rs` and added commands to invoke handler
+- Updated `src/components/PluginSandbox.tsx` with postMessage bridge using `invoke("plugin_ipc", ...)`
+- Updated `src/components/Shell/MainContent.tsx` to pass `plugin` manifest to `PluginSandbox`
+- Created test plugin HTML at `%APPDATA%/aether/appsuite/plugins/journal/index.html` with `db:query` and `db:execute` test buttons
+- Verified: `cargo check` passes with 0 errors, `cargo clippy -D warnings` passes with 0 warnings, `cargo fmt` passes
+- Fixed clippy warnings: redundant closures replaced with function pointers, removed useless `.into()` conversion
+- Fixed `query_map` closure error type compatibility by using `row.get_ref(i)?` directly
+- Fixed `column_name` collection to return `Vec<String>` with proper error propagation
+- Fixed `ValueRef::Text` handling by using `String::from_utf8_lossy`
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors
+- All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
+

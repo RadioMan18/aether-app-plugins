@@ -1,6 +1,7 @@
 mod biometrics;
 mod commands;
 mod database;
+mod ipc;
 mod protocol;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,7 +28,9 @@ pub fn run() {
             commands::initialize_database,
             commands::unlock_database,
             commands::get_database_info,
-            commands::invoke_biometric_challenge
+            commands::invoke_biometric_challenge,
+            commands::register_plugin,
+            commands::plugin_ipc
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,5 +1,6 @@
 use crate::biometrics::{BiometricAuth, BiometricResult};
 use crate::database::Database;
+use crate::ipc::{PluginBroker, PluginRequest, PluginResponse};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::AppHandle;
@@ -92,6 +93,28 @@ pub fn get_database_info(app: AppHandle) -> Result<Option<DatabaseInfo>, String>
 pub async fn invoke_biometric_challenge(message: String) -> Result<BiometricResult, String> {
     let auth = BiometricAuth::new();
     auth.invoke_challenge(&message).await
+}
+
+#[tauri::command]
+pub fn register_plugin(
+    app: AppHandle,
+    id: String,
+    name: String,
+    version: String,
+    permissions: Vec<String>,
+) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    db.register_plugin(&id, &name, &version, &permissions)
+}
+
+#[tauri::command]
+pub fn plugin_ipc(app: AppHandle, request: PluginRequest) -> Result<PluginResponse, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let broker = PluginBroker::new(&db);
+    let plugin_id = request.plugin_id.clone();
+    broker.handle(&plugin_id, request)
 }
 
 fn get_app_data_dir(_app: &AppHandle) -> Result<PathBuf, String> {

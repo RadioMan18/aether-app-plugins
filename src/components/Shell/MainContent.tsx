@@ -43,6 +43,7 @@ export function MainContent({ activePlugin }: MainContentProps) {
                   <PluginSandbox
                     src={`plugin://localhost/${activePlugin.id}/index.html`}
                     title={activePlugin.name}
+                    plugin={activePlugin}
                   />
                 </div>
               ) : (

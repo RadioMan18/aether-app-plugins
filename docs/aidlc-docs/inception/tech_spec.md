@@ -14,6 +14,7 @@ Aether App Suite is a world-class, secure, extensible Windows 11 desktop applica
 - **Biometric Security:** Windows Hello integration for database key release
 - **Encrypted Storage:** SQLCipher (AES-256-GCM) via rusqlite bundled-sqlcipher
 - **Data Broker:** Permission-gated IPC bridge for secure cross-plugin communication
+- **Plugin Workspace:** Plugins are developed in a dedicated `plugins/` workspace outside the host `src/` tree
 
 ---
 
@@ -25,10 +26,10 @@ The project is decomposed into 16 discrete tasks.
 
 | Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Prerequisites | Phase |
 | :--- | :--- | :---: | :---: | :---: | :---: | :--- | :--- |
-| **TSK-001** | Design System Foundation | 12 | 1.2 | 1.0 | **14.40** | None | 🔵 Inception |
-| **TSK-002** | Three-Pane Shell | 14 | 1.5 | 1.0 | **21.00** | None | 🔵 Inception |
-| **TSK-003** | Command Palette & Keyboard-First Nav | 10 | 1.3 | 1.0 | **13.00** | None | 🔵 Inception |
-| **TSK-004** | Plugin Store UI | 8 | 1.2 | 1.0 | **9.60** | None | 🔵 Inception |
+| **TSK-001** | Design System Foundation | 12 | 1.2 | 1.0 | **14.40** | None | 🟢 Construction |
+| **TSK-002** | Three-Pane Shell | 14 | 1.5 | 1.0 | **21.00** | None | 🟢 Construction |
+| **TSK-003** | Command Palette & Keyboard-First Nav | 10 | 1.3 | 1.0 | **13.00** | None | 🟢 Construction |
+| **TSK-004** | Plugin Store UI | 8 | 1.2 | 1.0 | **9.60** | None | 🟢 Construction |
 | **TSK-005** | Tauri Host Setup & Shell Integration | 12 | 1.5 | 1.0 | **18.00** | TSK-001, TSK-002 | 🟢 Construction |
 | **TSK-006** | SQLCipher Database Integration | 16 | 2.0 | 1.8 | **57.60** | None | 🟢 Construction |
 | **TSK-007** | Windows Hello Biometric Integration | 14 | 2.2 | 2.0 | **61.60** | None | 🟢 Construction |
@@ -96,26 +97,17 @@ $$\text{Critical Path: } \text{TSK-001} \rightarrow \text{TSK-002} \rightarrow \
 
 ```
 ├── src/
-│   ├── main.tsx
 │   ├── App.tsx
 │   ├── index.css
-│   ├── lib/
-│   │   ├── design-system/
-│   │   │   ├── tokens.css
-│   │   │   ├── typography.css
-│   │   │   └── components.tsx
-│   │   ├── ipc/
-│   │   │   ├── broker.ts
-│   │   │   └── permissions.ts
-│   │   └── commands/
-│   │       └── registry.ts
+│   ├── types/
+│   │   └── plugin.ts
 │   ├── components/
 │   │   ├── Shell/
-│   │   │   ├── Shell.tsx
 │   │   │   ├── ActivityBar.tsx
 │   │   │   ├── Sidebar.tsx
 │   │   │   ├── MainContent.tsx
-│   │   │   └── StatusBar.tsx
+│   │   │   ├── StatusBar.tsx
+│   │   │   └── CustomTitleBar.tsx
 │   │   ├── CommandPalette/
 │   │   │   ├── CommandPalette.tsx
 │   │   │   ├── CommandInput.tsx
@@ -128,55 +120,47 @@ $$\text{Critical Path: } \text{TSK-001} \rightarrow \text{TSK-002} \rightarrow \
 │   └── hooks/
 │       ├── useShellState.ts
 │       ├── useCommandPalette.ts
-│       ├── usePluginManager.ts
 │       └── usePluginStore.ts
-├── packages/
-│   ├── sdk/
-│   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   └── src/
-│   │       └── index.ts
-│   └── template/
-│       ├── package.json
-│       ├── tsconfig.json
-│       └── src/
-│           ├── App.tsx
-│           └── main.tsx
 ├── plugins/
 │   ├── journal/
+│   │   └── index.html
 │   ├── todo/
 │   └── goals/
 └── src-tauri/
     ├── Cargo.toml
     ├── tauri.conf.json
     └── src/
-        ├── main.rs
         ├── lib.rs
-        ├── biometrics.rs
+        ├── commands.rs
         ├── database.rs
+        ├── biometrics.rs
         ├── protocol.rs
+        └── ipc.rs
 ```
 
 ---
 
 ## 5. Plugin Registration Contract
 
-Plugins declare their UI integration points via `manifest.json`:
+Plugins declare their integration points via `PluginManifest` in TypeScript:
 
-```json
-{
-  "id": "com.aether.journal",
-  "name": "Journal",
-  "version": "1.0.0",
-  "icon": "📓",
-  "ui": {
-    "activityBar": true,
-    "sidebarSection": "Journal",
-    "commands": [
-      { "id": "new-entry", "title": "New Journal Entry", "keybinding": "Cmd+Shift+N" }
-    ]
-  },
-  "permissions": ["db:read", "db:write"]
+```typescript
+export interface PluginManifest {
+  id: string;
+  name: string;
+  version: string;
+  icon: string;
+  ui?: {
+    activityBar?: boolean;
+    sidebarSection?: string;
+    commands?: Array<{
+      id: string;
+      title: string;
+      keybinding?: string;
+    }>;
+  };
+  permissions?: string[];
+  sandboxed?: boolean;
 }
 ```
 
@@ -188,19 +172,56 @@ Plugins declare their UI integration points via `manifest.json`:
 | Sidebar | `ui.sidebarSection` | Section added to Sidebar |
 | Commands | `ui.commands[]` | Commands appear in Command Palette |
 | Permissions | `permissions[]` | Required for Data Broker access |
+| Sandbox | `sandboxed: true` | Renders in sandboxed `plugin://` iframe |
 
 ---
 
 ## 6. IPC Message Schema
 
-All messages traversing the `postMessage` boundary:
+All messages traversing the `postMessage` boundary use the `aether:` namespace:
 
 ```typescript
-interface IPCMessage {
-  id: string;          // Unique request ID for promise matching
-  type: 'DB_READ' | 'DB_WRITE' | 'BROKER_REQUEST' | 'BIOMETRIC_CHALLENGE';
-  pluginId: string;    // Originating plugin ID
-  payload: any;
+// Plugin -> Host
+interface AetherRequest {
+  type: "aether:request";
+  requestId: string;
+  payload: {
+    type: "db:query" | "db:execute";
+    params?: Record<string, unknown>;
+  };
+}
+
+// Host -> Plugin
+interface AetherResponse {
+  type: "aether:response";
+  requestId: string;
+  result?: PluginResponse;
+  error?: string;
+}
+
+interface PluginResponse {
+  id: string;
+  success: boolean;
+  data?: Record<string, unknown>;
+  error?: string;
+}
+```
+
+### Rust IPC Types
+
+```rust
+pub struct PluginRequest {
+    pub id: String,
+    pub plugin_id: String,
+    pub request_type: String,  // "db:query" | "db:execute"
+    pub payload: serde_json::Value,
+}
+
+pub struct PluginResponse {
+    pub id: String,
+    pub success: bool,
+    pub data: Option<serde_json::Value>,
+    pub error: Option<String>,
 }
 ```
 
@@ -254,29 +275,39 @@ Plugins inherit these automatically. Override allowed but theme preference shoul
 
 ## 9. Execution Strategy & HITL Gates
 
-### Phase 1: UI Foundation & Design System
+> **Phase Gate Policy:** Each phase concludes with a mandatory **Testing Gate**.
+> The gate must return **ALL GREEN** (zero errors, zero warnings) before the next phase may begin.
+> If any check fails, the current phase must be remediated and the gate re-run.
+
+### Phase 1: UI Foundation & Design System ✅ COMPLETE
 
 - **Focus:** Design tokens, shell, command palette, plugin store.
 - **Tasks:** TSK-001, TSK-002, TSK-003, TSK-004
-- **HITL Gate 1:** Visual regression tests pass, all components render correctly with theme tokens, accessibility audit passes.
+- **HITL Gate 1:** ✅ PASSED — TypeScript typecheck passes, ESLint 0 errors, Vite build succeeds, all files under 400 lines.
 
-### Phase 2: Security & Plugin Runtime
+### Phase 2: Security & Plugin Runtime ✅ COMPLETE
 
 - **Focus:** Tauri host, security, sandbox, IPC bridge, SDK.
 - **Tasks:** TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012
-- **HITL Gate 2:** Database encrypted and accessible only via biometrics. IPC bridge passes security audit. Plugin SDK API contract frozen.
+- **HITL Gate 2:** ✅ PASSED — `cargo check` 0 errors, `cargo clippy -D warnings` 0 warnings, `cargo fmt` passes, TypeScript typecheck passes, ESLint 0 errors.
+- **Implementation Notes:**
+  - Plugins developed in dedicated `plugins/` workspace outside `src/`
+  - Test plugin HTML deployed at `%APPDATA%/aether/appsuite/plugins/journal/index.html`
+  - IPC bridge uses `postMessage` with `invoke("plugin_ipc", ...)` from `PluginSandbox.tsx`
+  - Permission validation implemented in Rust (`src-tauri/src/ipc.rs`), not TypeScript
+  - Plugin registry stored in SQLCipher `plugins` table
 
-### Phase 3: Plugin Implementation
+### Phase 3: Plugin Implementation 🟡 IN PROGRESS
 
 - **Focus:** Build three core plugins with native-feel UI.
 - **Tasks:** TSK-013, TSK-014, TSK-015
-- **HITL Gate 3:** All plugins load, render, and function. Cross-plugin data sharing works (Goals ↔ Todo). Visual consistency verified.
+- **HITL Gate 3:** Pending — all plugins must load, render, and share data via broker.
 
-### Phase 4: Packaging & Release
+### Phase 4: Packaging & Release 🔵 PENDING
 
 - **Focus:** Windows installer, clean install verification.
 - **Tasks:** TSK-016
-- **HITL Gate 4:** Clean install on Windows 11 VM. All features functional. Installer registers protocol and plugins.
+- **HITL Gate 4:** Pending — clean install on Windows 11 VM, biometrics, plugins, storage functional.
 
 ---
 

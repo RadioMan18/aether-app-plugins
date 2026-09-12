@@ -130,3 +130,21 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
 - All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
 
+## TSK-008 Completed: Secure Key Release & DB Decryption
+
+**Timestamp**: 2026-09-12T16:42:00Z
+**Action**: Completed Secure Key Release & DB Decryption task. Migrated DB key storage from plaintext file to OS credential manager, added biometric-gated unlock flow, and zeroized key material in memory.
+**Details**:
+- Added `keyring = "2"` and `zeroize = { version = "1.5", features = ["alloc"] }` to `src-tauri/Cargo.toml`
+- Refactored `src-tauri/src/database.rs` to use `CredentialManager` abstraction backed by `keyring` crate
+- Removed plaintext `db.key` file storage; key is now stored in Windows Credential Manager under service `aether-app-suite`
+- Added `Database::initialize_new` for first-time setup: generates 32-byte key, stores hex-encoded key in credential manager, opens DB
+- Added `Database::open` to retrieve key from credential manager and open existing encrypted DB
+- Key material is zeroized in memory via `zeroize::Zeroize` after PRAGMA key is set and after `initialize_new` returns
+- Added `unlock_database` async Tauri command in `commands.rs` that triggers biometric challenge, retrieves key from credential manager, and opens DB
+- Modified `lib.rs` setup hook to no longer auto-initialize database; frontend must call `initialize_database` or `unlock_database` explicitly
+- Removed duplicate `get_app_data_dir` from `lib.rs`; retained in `commands.rs`
+- Verified: `cargo check` passes with 0 errors, `cargo clippy -D warnings` passes with 0 warnings, `cargo fmt` passes
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
+- All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
+

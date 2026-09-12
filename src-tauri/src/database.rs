@@ -1,6 +1,7 @@
 use rand::Rng;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Mutex;
+use zeroize::Zeroize;
 
 pub struct Database {
     #[allow(dead_code)]
@@ -14,13 +15,59 @@ impl Database {
             .map_err(|e| format!("Failed to create app data directory: {}", e))?;
 
         let db_path = app_data_dir.join("aether.db");
-        let key = Self::get_or_create_key(&app_data_dir)?;
+        let key = CredentialManager::retrieve_key().map_err(|e| {
+            format!(
+                "Failed to retrieve encryption key from credential manager: {}",
+                e
+            )
+        })?;
 
+        Self::open_with_key(db_path, key)
+    }
+
+    pub fn initialize_new(app_data_dir: PathBuf) -> Result<Self, String> {
+        std::fs::create_dir_all(&app_data_dir)
+            .map_err(|e| format!("Failed to create app data directory: {}", e))?;
+
+        let db_path = app_data_dir.join("aether.db");
+        let mut key = [0u8; 32];
+        rand::rng().fill(&mut key);
+
+        let mut key_hex = hex::encode(key);
+        CredentialManager::store_key(&key_hex).map_err(|e| {
+            format!(
+                "Failed to store encryption key in credential manager: {}",
+                e
+            )
+        })?;
+
+        let result = Self::open_with_key(db_path, key_hex.clone());
+        key.zeroize();
+        key_hex.zeroize();
+        result
+    }
+
+    pub fn db_path(&self) -> &PathBuf {
+        &self.db_path
+    }
+
+    #[allow(dead_code)]
+    pub fn with_connection<F, R>(&self, f: F) -> Result<R, String>
+    where
+        F: FnOnce(&rusqlite::Connection) -> Result<R, String>,
+    {
+        let conn = self
+            .conn
+            .lock()
+            .map_err(|e| format!("Failed to acquire database lock: {}", e))?;
+        f(&conn)
+    }
+
+    fn open_with_key(db_path: PathBuf, key: String) -> Result<Self, String> {
         let conn = rusqlite::Connection::open(&db_path)
             .map_err(|e| format!("Failed to open database: {}", e))?;
 
-        let key_hex = hex::encode(key);
-        conn.execute_batch(&format!("PRAGMA key = '{}';", key_hex))
+        conn.execute_batch(&format!("PRAGMA key = '{}';", key))
             .map_err(|e| format!("Failed to set encryption key: {}", e))?;
 
         let integrity: String = conn
@@ -40,42 +87,33 @@ impl Database {
         })
     }
 
-    pub fn db_path(&self) -> &PathBuf {
-        &self.db_path
-    }
-
-    #[allow(dead_code)]
-    pub fn with_connection<F, R>(&self, f: F) -> Result<R, String>
-    where
-        F: FnOnce(&rusqlite::Connection) -> Result<R, String>,
-    {
-        let conn = self
-            .conn
-            .lock()
-            .map_err(|e| format!("Failed to acquire database lock: {}", e))?;
-        f(&conn)
-    }
-
-    fn get_or_create_key(app_data_dir: &Path) -> Result<Vec<u8>, String> {
-        let key_path = app_data_dir.join("db.key");
-
-        if key_path.exists() {
-            let key = std::fs::read(&key_path)
-                .map_err(|e| format!("Failed to read database key: {}", e))?;
-            return Ok(key);
-        }
-
-        let mut key = [0u8; 32];
-        rand::rng().fill(&mut key);
-        std::fs::write(&key_path, key)
-            .map_err(|e| format!("Failed to write database key: {}", e))?;
-
-        Ok(key.to_vec())
-    }
-
     fn initialize_schema(conn: &rusqlite::Connection) -> Result<(), String> {
         conn.execute_batch(include_str!("schema.sql"))
             .map_err(|e| format!("Failed to initialize schema: {}", e))?;
         Ok(())
+    }
+}
+
+struct CredentialManager;
+
+impl CredentialManager {
+    const SERVICE: &'static str = "aether-app-suite";
+    const USERNAME: &'static str = "db-encryption-key";
+
+    fn store_key(key: &str) -> Result<(), String> {
+        let entry = keyring::Entry::new(Self::SERVICE, Self::USERNAME)
+            .map_err(|e| format!("Failed to create credential manager entry: {}", e))?;
+        entry
+            .set_password(key)
+            .map_err(|e| format!("Failed to store encryption key: {}", e))?;
+        Ok(())
+    }
+
+    fn retrieve_key() -> Result<String, String> {
+        let entry = keyring::Entry::new(Self::SERVICE, Self::USERNAME)
+            .map_err(|e| format!("Failed to create credential manager entry: {}", e))?;
+        entry
+            .get_password()
+            .map_err(|e| format!("Failed to retrieve encryption key: {}", e))
     }
 }

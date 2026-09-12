@@ -4,7 +4,7 @@
 
 - **Active Branch:** `main`
 - **Current Phase:** 🔵 Inception
-- **Overall Completion:** 44%
+- **Overall Completion:** 50%
 
 ## 2. Task Board
 
@@ -22,7 +22,7 @@ Each task must be marked as `[ ]` (Todo), `[/]` (In Progress), or `[x]` (Complet
 - [x] TSK-005 (Est: 12h) — Tauri Host Setup & Shell Integration
 - [x] TSK-006 (Est: 16h) — SQLCipher Database Integration
 - [x] TSK-007 (Est: 14h) — Windows Hello Biometric Integration
-- [ ] TSK-008 (Est: 10h) — Secure Key Release & DB Decryption
+- [x] TSK-008 (Est: 10h) — Secure Key Release & DB Decryption
 - [ ] TSK-009 (Est: 15h) — Custom URI Scheme & Sandboxed Plugin Iframe
 - [ ] TSK-010 (Est: 20h) — Secure IPC Bridge & Permission-Gated Data Broker
 - [ ] TSK-011 (Est: 12h) — Plugin Installer & Manager

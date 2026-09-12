@@ -1,9 +1,8 @@
 use crate::biometrics::{BiometricAuth, BiometricResult};
+use crate::database::Database;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::AppHandle;
-
-use crate::database::Database;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GreetPayload {
@@ -36,7 +35,37 @@ pub fn get_app_version() -> Result<String, String> {
 #[tauri::command]
 pub fn initialize_database(app: AppHandle) -> Result<DatabaseInfo, String> {
     let app_data_dir = get_app_data_dir(&app)?;
-    let db = Database::open(app_data_dir.clone()).map_err(|e| e.to_string())?;
+    let db = Database::initialize_new(app_data_dir.clone()).map_err(|e| e.to_string())?;
+
+    Ok(DatabaseInfo {
+        path: db.db_path().to_string_lossy().to_string(),
+        initialized: true,
+    })
+}
+
+#[tauri::command]
+pub async fn unlock_database(app: AppHandle) -> Result<DatabaseInfo, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db_path = app_data_dir.join("aether.db");
+
+    if !db_path.exists() {
+        return Err("Database does not exist. Please initialize first.".to_string());
+    }
+
+    let auth = BiometricAuth::new();
+    let biometric_result = auth
+        .invoke_challenge("Unlock Aether App Suite")
+        .await
+        .map_err(|e| format!("Biometric challenge failed: {}", e))?;
+
+    if !biometric_result.success {
+        return Err(format!(
+            "Biometric verification failed: {}",
+            biometric_result.message
+        ));
+    }
+
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
 
     Ok(DatabaseInfo {
         path: db.db_path().to_string_lossy().to_string(),

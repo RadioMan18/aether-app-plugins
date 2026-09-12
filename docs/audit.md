@@ -113,3 +113,20 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
 - All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
 
+## TSK-007 Completed: Windows Hello Biometric Integration
+
+**Timestamp**: 2026-09-12T15:05:00Z
+**Action**: Completed Windows Hello Biometric Integration task. Added windows crate, biometric challenge command, and graceful degradation for unavailable biometrics.
+**Details**:
+- Added `windows` crate to `src-tauri/Cargo.toml` with `Foundation` and `Security_Credentials_UI` features
+- Created `src-tauri/src/biometrics.rs` with `BiometricAuth` struct and `invoke_challenge` async method
+- Implemented `CheckAvailabilityAsync` to detect Windows Hello availability with graceful degradation
+- Implemented `RequestVerificationAsync` to trigger biometric prompt with custom message
+- Used `UserConsentVerifierAvailability` and `UserConsentVerificationResult` WinRT types
+- Returns `BiometricResult` with `success`, `available`, and `message` fields
+- Exposed `invoke_biometric_challenge` Tauri command in `commands.rs` and registered in `lib.rs`
+- Verified: `cargo check` passes with 0 errors, `cargo clippy` passes with 0 errors, `cargo fmt` passes
+- Fixed clippy warnings: `dead_code` on unused database.rs fields/methods and `ptr_arg` for `&PathBuf`
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
+- All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
+

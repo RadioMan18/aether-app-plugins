@@ -1,8 +1,9 @@
 use rand::Rng;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 pub struct Database {
+    #[allow(dead_code)]
     conn: Mutex<rusqlite::Connection>,
     db_path: PathBuf,
 }
@@ -43,6 +44,7 @@ impl Database {
         &self.db_path
     }
 
+    #[allow(dead_code)]
     pub fn with_connection<F, R>(&self, f: F) -> Result<R, String>
     where
         F: FnOnce(&rusqlite::Connection) -> Result<R, String>,
@@ -54,7 +56,7 @@ impl Database {
         f(&conn)
     }
 
-    fn get_or_create_key(app_data_dir: &PathBuf) -> Result<Vec<u8>, String> {
+    fn get_or_create_key(app_data_dir: &Path) -> Result<Vec<u8>, String> {
         let key_path = app_data_dir.join("db.key");
 
         if key_path.exists() {

@@ -1,3 +1,4 @@
+mod biometrics;
 mod commands;
 mod database;
 
@@ -24,7 +25,8 @@ pub fn run() {
             commands::greet,
             commands::get_app_version,
             commands::initialize_database,
-            commands::get_database_info
+            commands::get_database_info,
+            commands::invoke_biometric_challenge
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

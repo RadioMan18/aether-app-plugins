@@ -1,3 +1,4 @@
+use crate::biometrics::{BiometricAuth, BiometricResult};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tauri::AppHandle;
@@ -56,6 +57,12 @@ pub fn get_database_info(app: AppHandle) -> Result<Option<DatabaseInfo>, String>
         path: db_path.to_string_lossy().to_string(),
         initialized: true,
     }))
+}
+
+#[tauri::command]
+pub async fn invoke_biometric_challenge(message: String) -> Result<BiometricResult, String> {
+    let auth = BiometricAuth::new();
+    auth.invoke_challenge(&message).await
 }
 
 fn get_app_data_dir(_app: &AppHandle) -> Result<PathBuf, String> {

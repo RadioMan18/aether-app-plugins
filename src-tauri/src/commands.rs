@@ -1,5 +1,5 @@
 use crate::biometrics::{BiometricAuth, BiometricResult};
-use crate::database::Database;
+use crate::database::{Database, PluginInfo};
 use crate::ipc::{PluginBroker, PluginRequest, PluginResponse};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -115,6 +115,36 @@ pub fn plugin_ipc(app: AppHandle, request: PluginRequest) -> Result<PluginRespon
     let broker = PluginBroker::new(&db);
     let plugin_id = request.plugin_id.clone();
     broker.handle(&plugin_id, request)
+}
+
+#[tauri::command]
+pub fn install_plugin(
+    app: AppHandle,
+    id: String,
+    name: String,
+    version: String,
+    permissions: Vec<String>,
+    zip_data: Vec<u8>,
+) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir.clone()).map_err(|e| e.to_string())?;
+    db.register_plugin(&id, &name, &version, &permissions)?;
+    db.extract_plugin(app_data_dir, &id, &zip_data).map(|_| ())
+}
+
+#[tauri::command]
+pub fn list_plugins(app: AppHandle) -> Result<Vec<PluginInfo>, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    db.list_plugins()
+}
+
+#[tauri::command]
+pub fn uninstall_plugin(app: AppHandle, id: String) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir.clone()).map_err(|e| e.to_string())?;
+    db.uninstall_plugin(&id)?;
+    db.remove_plugin_files(app_data_dir, &id)
 }
 
 fn get_app_data_dir(_app: &AppHandle) -> Result<PathBuf, String> {

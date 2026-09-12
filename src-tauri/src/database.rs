@@ -1,5 +1,6 @@
 use rand::Rng;
-use std::path::PathBuf;
+use serde::{Deserialize, Serialize};
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use zeroize::Zeroize;
 
@@ -124,6 +125,109 @@ impl Database {
                 serde_json::from_str(&permissions_json).map_err(|e| e.to_string())?;
             Ok(permissions)
         })
+    }
+
+    pub fn list_plugins(&self) -> Result<Vec<PluginInfo>, String> {
+        self.with_connection(|conn| {
+            let mut stmt = conn
+                .prepare("SELECT id, name, version, permissions, installed_at FROM plugins")
+                .map_err(|e| e.to_string())?;
+            let rows = stmt
+                .query_map([], |row| {
+                    Ok(PluginInfo {
+                        id: row.get(0)?,
+                        name: row.get(1)?,
+                        version: row.get(2)?,
+                        permissions: serde_json::from_str(&row.get::<_, String>(3)?)
+                            .unwrap_or_default(),
+                        installed_at: row.get(4)?,
+                    })
+                })
+                .map_err(|e| e.to_string())?;
+            rows.collect::<Result<Vec<_>, _>>()
+                .map_err(|e| e.to_string())
+        })
+    }
+
+    pub fn uninstall_plugin(&self, plugin_id: &str) -> Result<(), String> {
+        self.with_connection(|conn| {
+            conn.execute(
+                "DELETE FROM plugins WHERE id = ?1",
+                rusqlite::params![plugin_id],
+            )
+            .map_err(|e| e.to_string())?;
+            Ok(())
+        })
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PluginInfo {
+    pub id: String,
+    pub name: String,
+    pub version: String,
+    pub permissions: Vec<String>,
+    pub installed_at: String,
+}
+
+impl Database {
+    pub fn plugins_dir(app_data_dir: &Path) -> Result<PathBuf, String> {
+        let plugins_dir = app_data_dir.join("plugins");
+        std::fs::create_dir_all(&plugins_dir)
+            .map_err(|e| format!("Failed to create plugins directory: {}", e))?;
+        Ok(plugins_dir)
+    }
+
+    pub fn extract_plugin(
+        &self,
+        app_data_dir: PathBuf,
+        plugin_id: &str,
+        zip_data: &[u8],
+    ) -> Result<PathBuf, String> {
+        let plugins_dir = Self::plugins_dir(&app_data_dir)?;
+        let plugin_dir = plugins_dir.join(plugin_id);
+        std::fs::create_dir_all(&plugin_dir)
+            .map_err(|e| format!("Failed to create plugin directory: {}", e))?;
+
+        let cursor = std::io::Cursor::new(zip_data);
+        let mut archive = zip::ZipArchive::new(cursor)
+            .map_err(|e| format!("Failed to read plugin zip: {}", e))?;
+
+        for i in 0..archive.len() {
+            let mut file = archive
+                .by_index(i)
+                .map_err(|e| format!("Failed to read zip entry: {}", e))?;
+            let out_path = plugin_dir.join(file.mangled_name().as_path());
+            if file.is_dir() {
+                std::fs::create_dir_all(&out_path)
+                    .map_err(|e| format!("Failed to create directory: {}", e))?;
+            } else {
+                if let Some(parent) = out_path.parent() {
+                    std::fs::create_dir_all(parent)
+                        .map_err(|e| format!("Failed to create parent directory: {}", e))?;
+                }
+                let mut outfile = std::fs::File::create(&out_path)
+                    .map_err(|e| format!("Failed to create file: {}", e))?;
+                std::io::copy(&mut file, &mut outfile)
+                    .map_err(|e| format!("Failed to write file: {}", e))?;
+            }
+        }
+
+        Ok(plugin_dir)
+    }
+
+    pub fn remove_plugin_files(
+        &self,
+        app_data_dir: PathBuf,
+        plugin_id: &str,
+    ) -> Result<(), String> {
+        let plugins_dir = Self::plugins_dir(&app_data_dir)?;
+        let plugin_dir = plugins_dir.join(plugin_id);
+        if plugin_dir.exists() {
+            std::fs::remove_dir_all(&plugin_dir)
+                .map_err(|e| format!("Failed to remove plugin directory: {}", e))?;
+        }
+        Ok(())
     }
 }
 

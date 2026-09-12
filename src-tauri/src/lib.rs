@@ -30,7 +30,10 @@ pub fn run() {
             commands::get_database_info,
             commands::invoke_biometric_challenge,
             commands::register_plugin,
-            commands::plugin_ipc
+            commands::plugin_ipc,
+            commands::install_plugin,
+            commands::list_plugins,
+            commands::uninstall_plugin
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

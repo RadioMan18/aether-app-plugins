@@ -28,3 +28,4 @@ rusqlite = { version = "0.32", features = ["bundled-sqlcipher", "chrono", "uuid"
 windows = { version = "0.52", features = ["Foundation", "Security_Credentials_UI"] }
 keyring = "2"
 zeroize = { version = "1.5", features = ["alloc"] }
+zip = "2"

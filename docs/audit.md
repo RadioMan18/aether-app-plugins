@@ -195,3 +195,22 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors
 - All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
 
+## TSK-011 Completed: Plugin Installer & Manager
+
+**Timestamp**: 2026-09-12T23:35:00Z
+**Action**: Completed Plugin Installer & Manager task. Added Rust zip extraction, plugin registry commands, and frontend `usePluginManager` hook integrated with Plugin Store.
+**Details**:
+- Added `zip = "2"` dependency to `src-tauri/Cargo.toml`
+- Added `PluginInfo` struct to `src-tauri/src/database.rs` with serde derive
+- Added `Database::plugins_dir`, `Database::extract_plugin`, `Database::remove_plugin_files` methods
+- Added `Database::list_plugins` and `Database::uninstall_plugin` methods
+- Added `install_plugin`, `list_plugins`, `uninstall_plugin` Tauri commands in `commands.rs`
+- Registered new commands in `lib.rs` invoke handler
+- Created `src/hooks/usePluginManager.ts` with `installPlugin`, `uninstallPlugin`, `refreshPlugins`, `installedPlugins`, `isLoading`, `error`
+- Updated `src/components/PluginStore/PluginStore.tsx` to use `usePluginManager` for real install/uninstall flow
+- Created `plugins/` workspace directory for plugin source
+- Verified: `cargo check` passes with 0 errors, `cargo clippy -D warnings` passes with 0 warnings, `cargo fmt` passes
+- Fixed clippy `ptr_arg` warning by changing `&PathBuf` to `&Path` in `plugins_dir`
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2004 modules)
+- All source files under 400 lines (largest: PluginStore.tsx at 183 lines)
+

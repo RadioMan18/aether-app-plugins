@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Input } from "@/lib/design-system/components";
 import { Search } from "lucide-react";
 import { usePluginStore } from "@/hooks/usePluginStore";
+import { usePluginManager } from "@/hooks/usePluginManager";
 import type { StoreItem, StoreCategory, StoreTab } from "@/types/plugin-store";
 import { PluginCard } from "./PluginCard";
 import { PluginDetail } from "./PluginDetail";
@@ -35,14 +36,39 @@ export function PluginStore({ items }: PluginStoreProps) {
     filteredItems,
     selectedItem,
     setSelectedItem,
-    install,
-    uninstall,
   } = usePluginStore(items);
+
+  const { installPlugin, uninstallPlugin, error } = usePluginManager();
 
   const updatesCount = useMemo(
     () => items.filter((item) => item.updateAvailable).length,
     [items]
   );
+
+  const handleInstall = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+
+    try {
+      await installPlugin(
+        item.id,
+        item.name,
+        item.version,
+        item.permissions,
+        new ArrayBuffer(0)
+      );
+    } catch {
+      // error handled by hook
+    }
+  };
+
+  const handleUninstall = async (id: string) => {
+    try {
+      await uninstallPlugin(id);
+    } catch {
+      // error handled by hook
+    }
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -91,7 +117,7 @@ export function PluginStore({ items }: PluginStoreProps) {
                 onClick={() => setTab(t.value)}
                 className={[
                   "relative rounded-md px-3 py-1.5 text-sm transition-colors duration-150",
-                  tab === t.value
+                  t.value === tab
                     ? "text-text-primary"
                     : "text-text-secondary hover:text-text-primary",
                 ].join(" ")}
@@ -110,6 +136,11 @@ export function PluginStore({ items }: PluginStoreProps) {
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+          {error && (
+            <div className="mb-4 rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+              {error}
+            </div>
+          )}
           {filteredItems.length === 0 ? (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
@@ -126,8 +157,8 @@ export function PluginStore({ items }: PluginStoreProps) {
                   key={item.id}
                   item={item}
                   onSelect={() => setSelectedItem(item)}
-                  onInstall={() => install(item.id)}
-                  onUninstall={() => uninstall(item.id)}
+                  onInstall={() => handleInstall(item.id)}
+                  onUninstall={() => handleUninstall(item.id)}
                   isSelected={selectedItem?.id === item.id}
                 />
               ))}
@@ -140,8 +171,8 @@ export function PluginStore({ items }: PluginStoreProps) {
             <PluginDetail
               item={selectedItem}
               onClose={() => setSelectedItem(null)}
-              onInstall={() => install(selectedItem.id)}
-              onUninstall={() => uninstall(selectedItem.id)}
+              onInstall={() => handleInstall(selectedItem.id)}
+              onUninstall={() => handleUninstall(selectedItem.id)}
             />
           </div>
         )}
@@ -149,3 +180,4 @@ export function PluginStore({ items }: PluginStoreProps) {
     </div>
   );
 }
+

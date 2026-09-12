@@ -46,3 +46,18 @@
 - Downgraded framer-motion from v12 to v11 to resolve build issues with motion-dom package
 - Verified: TypeScript typecheck passes, ESLint passes with 0 errors, Vite production build succeeds (1984 modules, 2.63s)
 - All source files under 400 lines (largest: components.tsx at 148 lines)
+
+## TSK-003 Completed: Command Palette & Keyboard-First Navigation
+
+**Timestamp**: 2026-09-12T01:05:00Z
+**Action**: Completed Command Palette task. Implemented Cmd+K overlay, command registry, fuzzy search, keyboard navigation, and shell action bindings.
+**Details**:
+- Created `src/lib/commands/registry.ts` with core commands (navigation, actions, settings) and fuzzy search function
+- Created `src/hooks/useCommandPalette.ts` for palette state, Cmd+K shortcut, Escape handling, and keyboard navigation
+- Created `src/hooks/useCommands.ts` to bind shell actions (toggle sidebar, switch plugins) to command entries
+- Created `src/components/CommandPalette/CommandPalette.tsx` as Framer Motion animated overlay with backdrop blur
+- Created `src/components/CommandPalette/CommandInput.tsx` with search input and ESC hint
+- Created `src/components/CommandPalette/CommandResults.tsx` with keyboard-navigable results list, icons, and keybinding hints
+- Wired palette into App.tsx with actual plugin switching and sidebar toggle actions
+- Verified: TypeScript typecheck passes, ESLint passes with 0 errors, Vite production build succeeds (1990 modules, 2.56s)
+- All source files under 400 lines (largest: components.tsx at 148 lines)

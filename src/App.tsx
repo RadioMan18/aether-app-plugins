@@ -3,6 +3,7 @@ import { ActivityBar } from "@/components/Shell/ActivityBar";
 import { Sidebar } from "@/components/Shell/Sidebar";
 import { MainContent } from "@/components/Shell/MainContent";
 import { StatusBar } from "@/components/Shell/StatusBar";
+import { CommandPalette } from "@/components/CommandPalette/CommandPalette";
 import { useShellState } from "@/hooks/useShellState";
 import type { PluginManifest } from "@/types/plugin";
 
@@ -57,6 +58,12 @@ function App() {
       />
       <MainContent activePlugin={activePlugin} />
       <StatusBar shell={shell} />
+      <CommandPalette
+        activePluginId={shell.activePluginId}
+        sidebarOpen={shell.sidebarOpen}
+        setActivePluginId={shell.setActivePluginId}
+        toggleSidebar={shell.toggleSidebar}
+      />
     </div>
   );
 }

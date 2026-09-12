@@ -1,66 +1,68 @@
-**Phase 2: Planning Mode**
+# Aether App Suite — Technical Architecture Specification
 
-# Technical Architecture Plan: Modular Desktop App Platform (Tauri + Windows 11)
+## 1. Executive Summary & Requirements
 
-This document establishes the complete technical architecture and dependency-aware execution plan for the modular desktop application platform. It is optimized for direct ingestion by the downstream pipeline (Task Extractor, Graph Engine, and AIDLC Generator).
-
----
-
-## 1. Executive Summary & Requirements Summary
-
-The objective is to build a high-performance, secure, and extensible Windows 11 desktop application using **Tauri v2** and **React**. The application features a sandboxed plugin architecture allowing users to import and run local plugins (Todo List, Goals Tracker, and Journaling) with host-mediated data sharing. Plugins are packaged as zip files containing all files needed to run, at minimum pre-built static assets and a `manifest.json`.
+Aether App Suite is a world-class, secure, extensible Windows 11 desktop application built with **Tauri v2** and **React**. It features a sandboxed plugin architecture with a polished, keyboard-first UI inspired by VS Code, Obsidian, Backstage, Raycast, Linear, Notion, Figma, and Arc Browser.
 
 ### Core Requirements
 
-* **Host Environment:** Tauri v2 (Rust backend) with a React + TypeScript + Tailwind CSS frontend styled to match Windows 11 Fluent Design guidelines.
-* **Plugin Sandbox:** Plugins run inside an `iframe` with strict sandboxing (`sandbox="allow-scripts"`). They are served via a custom Tauri URI scheme (`plugin://`) to prevent directory traversal and cross-origin issues.
-* **Biometric Security:** Integration with Windows Hello via the Windows Biometric Framework (`UserConsentVerifier`). The application must gracefully degrade (e.g., allow access with warning or alternative authentication) if Windows Hello is unavailable or not configured on the host machine.
-* **Encrypted Storage:** Journal entries and sensitive data are stored in a local SQLite database encrypted with **SQLCipher** (AES-256-GCM) via **rusqlite** with the `bundled-sqlcipher` feature. The decryption key is released from the Windows Credential Manager only after successful Windows Hello authentication.
-* **Data Broker:** A secure, permission-gated IPC bridge over `postMessage` that allows plugins to request data from other plugins via the host.
+- **UI Foundation:** shadcn/ui + Tailwind CSS + CSS custom properties as design token API
+- **Three-Pane Shell:** Activity Bar, Sidebar, Main Content, Status Bar (VS Code + Linear pattern)
+- **Plugin Sandbox:** Plugins run in sandboxed iframes via custom `plugin://` URI scheme
+- **Command Palette:** Universal `Cmd+K` search and command execution (Raycast + Linear pattern)
+- **Plugin Store:** Discovery and one-click installation experience
+- **Biometric Security:** Windows Hello integration for database key release
+- **Encrypted Storage:** SQLCipher (AES-256-GCM) via rusqlite bundled-sqlcipher
+- **Data Broker:** Permission-gated IPC bridge for secure cross-plugin communication
 
 ---
 
 ## 2. Task Decomposition & Dependency Graph (DAG)
 
-The project is decomposed into 12 discrete tasks. Task weights are calculated using the formula:
-$$\text{Weight} = \text{Estimated Hours} \times \text{Complexity Factor} \times \text{Risk Factor}$$
+The project is decomposed into 16 discrete tasks.
 
 ### Task Node Registry
 
-| Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Prerequisites | AIDLC Phase |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **TSK-001** | Tauri Host Setup & Fluent UI Shell | 12 | 1.5 | 1.0 | **18.00** | None | 🔵 Inception |
-| **TSK-002** | SQLCipher Database Integration | 16 | 2.0 | 1.8 | **57.60** | None | 🟢 Construction |
-| **TSK-003** | Windows Hello Biometric Integration | 14 | 2.2 | 2.0 | **61.60** | None | 🟢 Construction |
-| **TSK-004** | Secure Key Release & DB Decryption | 10 | 2.0 | 1.5 | **30.00** | TSK-002, TSK-003 | 🟢 Construction |
-| **TSK-005** | Custom URI Scheme & Sandboxed Iframe | 15 | 2.5 | 1.5 | **56.25** | TSK-001 | 🟢 Construction |
-| **TSK-006** | Secure IPC Bridge & Data Broker | 20 | 2.5 | 1.8 | **90.00** | TSK-005 | 🟢 Construction |
-| **TSK-007** | Plugin Installer & Manager | 12 | 1.8 | 1.2 | **25.92** | TSK-001, TSK-002 | 🟢 Construction |
-| **TSK-008** | Core Plugin SDK & React Template | 10 | 1.5 | 1.2 | **18.00** | TSK-006 | 🟢 Construction |
-| **TSK-009** | Journaling Plugin (Encrypted) | 16 | 1.8 | 1.2 | **34.56** | TSK-004, TSK-008 | 🟢 Construction |
-| **TSK-010** | Todo List Plugin | 10 | 1.2 | 1.0 | **12.00** | TSK-008 | 🟢 Construction |
-| **TSK-011** | Goals Tracker Plugin (Data Sharing) | 14 | 2.0 | 1.5 | **42.00** | TSK-008, TSK-010 | 🟢 Construction |
-| **TSK-012** | Windows Installer Packaging (NSIS) | 8 | 1.5 | 1.2 | **14.40** | TSK-007, TSK-009, TSK-011 | 🟡 Operations |
+| Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Prerequisites | Phase |
+| :--- | :--- | :---: | :---: | :---: | :---: | :--- | :--- |
+| **TSK-001** | Design System Foundation | 12 | 1.2 | 1.0 | **14.40** | None | 🔵 Inception |
+| **TSK-002** | Three-Pane Shell | 14 | 1.5 | 1.0 | **21.00** | None | 🔵 Inception |
+| **TSK-003** | Command Palette & Keyboard-First Nav | 10 | 1.3 | 1.0 | **13.00** | None | 🔵 Inception |
+| **TSK-004** | Plugin Store UI | 8 | 1.2 | 1.0 | **9.60** | None | 🔵 Inception |
+| **TSK-005** | Tauri Host Setup & Shell Integration | 12 | 1.5 | 1.0 | **18.00** | TSK-001, TSK-002 | 🟢 Construction |
+| **TSK-006** | SQLCipher Database Integration | 16 | 2.0 | 1.8 | **57.60** | None | 🟢 Construction |
+| **TSK-007** | Windows Hello Biometric Integration | 14 | 2.2 | 2.0 | **61.60** | None | 🟢 Construction |
+| **TSK-008** | Secure Key Release & DB Decryption | 10 | 2.0 | 1.5 | **30.00** | TSK-006, TSK-007 | 🟢 Construction |
+| **TSK-009** | Custom URI Scheme & Sandboxed Iframe | 15 | 2.5 | 1.5 | **56.25** | TSK-005 | 🟢 Construction |
+| **TSK-010** | Secure IPC Bridge & Data Broker | 20 | 2.5 | 1.8 | **90.00** | TSK-009 | 🟢 Construction |
+| **TSK-011** | Plugin Installer & Manager | 12 | 1.8 | 1.2 | **25.92** | TSK-005, TSK-006 | 🟢 Construction |
+| **TSK-012** | Core Plugin SDK & React Template | 10 | 1.5 | 1.2 | **18.00** | TSK-010 | 🟢 Construction |
+| **TSK-013** | Journaling Plugin | 16 | 1.8 | 1.2 | **34.56** | TSK-008, TSK-012 | 🟢 Construction |
+| **TSK-014** | Todo List Plugin | 10 | 1.2 | 1.0 | **12.00** | TSK-012 | 🟢 Construction |
+| **TSK-015** | Goals Tracker Plugin | 14 | 2.0 | 1.5 | **42.00** | TSK-012, TSK-014 | 🟢 Construction |
+| **TSK-016** | Windows Installer Packaging | 8 | 1.5 | 1.2 | **14.40** | TSK-011, TSK-013, TSK-015 | 🟡 Operations |
 
 ### Dependency Graph (DAG)
 
 ```mermaid
 graph TD
-    TSK-001[TSK-001: Tauri Host Setup] --> TSK-005[TSK-005: Custom URI Scheme]
-    TSK-001 --> TSK-007[TSK-007: Plugin Installer]
-    TSK-002[TSK-002: SQLCipher Integration] --> TSK-004[TSK-004: Secure Key Release]
-    TSK-002 --> TSK-007
-    TSK-003[TSK-003: Windows Hello Integration] --> TSK-004
-    TSK-005 --> TSK-006[TSK-006: Secure IPC Bridge]
-    TSK-006 --> TSK-008[TSK-008: Plugin SDK]
-    TSK-004 --> TSK-009[TSK-009: Journaling Plugin]
-    TSK-008 --> TSK-009
-    TSK-008 --> TSK-010[TSK-010: Todo List Plugin]
-    TSK-008 --> TSK-011[TSK-011: Goals Tracker]
-    TSK-010 --> TSK-011
-    TSK-007 --> TSK-012[TSK-012: Windows Installer]
-    TSK-009 --> TSK-012
-    TSK-011 --> TSK-012
+    TSK-001[TSK-001: Design System] --> TSK-005[TSK-005: Tauri Host]
+    TSK-002[TSK-002: Three-Pane Shell] --> TSK-005
+    TSK-003[TSK-003: Command Palette] --> TSK-005
+    TSK-004[TSK-004: Plugin Store UI] --> TSK-011[TSK-011: Plugin Manager]
+    TSK-005 --> TSK-009[TSK-009: URI Scheme]
+    TSK-006[TSK-006: SQLCipher] --> TSK-008[TSK-008: Key Release]
+    TSK-007[TSK-007: Windows Hello] --> TSK-008
+    TSK-009 --> TSK-010[TSK-010: IPC Bridge]
+    TSK-010 --> TSK-012[TSK-012: Plugin SDK]
+    TSK-008 --> TSK-013[TSK-013: Journaling]
+    TSK-012 --> TSK-013
+    TSK-012 --> TSK-014[TSK-014: Todo List]
+    TSK-014 --> TSK-015[TSK-015: Goals Tracker]
+    TSK-012 --> TSK-015
+    TSK-011 --> TSK-016[TSK-016: Windows Installer]
+    TSK-013 --> TSK-016
+    TSK-015 --> TSK-016
 ```
 
 ---
@@ -69,152 +71,129 @@ graph TD
 
 ### Critical Path Analysis
 
-The critical path represents the sequence of dependent tasks that determines the minimum possible duration of the project.
+The critical path represents the sequence of dependent tasks that determines the minimum possible duration.
 
-$$\text{Critical Path: } \text{TSK-001} \rightarrow \text{TSK-005} \rightarrow \text{TSK-006} \rightarrow \text{TSK-008} \rightarrow \text{TSK-010} \rightarrow \text{TSK-011} \rightarrow \text{TSK-012}$$
+$$\text{Critical Path: } \text{TSK-001} \rightarrow \text{TSK-002} \rightarrow \text{TSK-003} \rightarrow \text{TSK-005} \rightarrow \text{TSK-010} \rightarrow \text{TSK-012} \rightarrow \text{TSK-016}$$
 
-* **Total Weighted Duration:** **250.65 weighted hours** (approx. 89 actual development hours).
-* **Strategic Directive:** Tasks on this path have zero float. Any delay in the custom URI scheme, IPC bridge, or SDK directly delays the final release. These tasks must be prioritized during resource allocation.
+- **Total Weighted Duration:** **286.15 weighted hours** (approx. 95 actual development hours).
+- **Strategic Directive:** Tasks on this path have zero float. The IPC Bridge (TSK-010) and Plugin SDK (TSK-012) must be prioritized.
 
 ### Parallel Tracks & Float (Slack)
 
-* **Biometrics & Database Track ($\text{TSK-002}, \text{TSK-003} \rightarrow \text{TSK-004}$):** This track runs in parallel with the UI and Sandbox track. $\text{TSK-004}$ has a float of **90.65 weighted hours**. This allows the complex integration of SQLCipher and Windows Hello to be thoroughly tested without impacting the critical path.
-* **Plugin Installer ($\text{TSK-007}$):** This task has a float of **152.73 weighted hours**, allowing its implementation to be deferred until the core runtime is stable.
-* **Journaling Plugin ($\text{TSK-009}$):** This task has a float of **19.44 weighted hours**, depending on the completion of the secure key release mechanism ($\text{TSK-004}$).
+- **Security Track (TSK-006, TSK-007 → TSK-008):** Runs in parallel with UI track. TSK-008 has float of **56.00 weighted hours**.
+- **Plugin Store UI (TSK-004):** Can be built in parallel with shell. Float of **140.15 weighted hours**.
+- **Journaling Plugin (TSK-013):** Has float of **0 weighted hours** on critical path via TSK-008.
 
 ### Bottleneck Nodes
 
-* **$\text{TSK-006}$ (Secure IPC Bridge):** Highest weight task (90.00) and critical gateway for all plugin communication.
-* **$\text{TSK-008}$ (Plugin SDK):** Out-degree of 3. All core plugins depend on this SDK. The API contract must be frozen early to prevent downstream churn.
-* **$\text{TSK-004}$ (Secure Key Release):** Merges biometrics and database security. It is a critical gatekeeper for the Journaling plugin ($\text{TSK-009}$).
-* **$\text{TSK-012}$ (Windows Installer Packaging):** Highest in-degree node on the critical path, requiring completion of Plugin Installer, Journaling, and Goals Tracker before packaging can begin.
+- **TSK-010 (Secure IPC Bridge):** Highest weight (90.00). Critical gateway for all plugin communication.
+- **TSK-012 (Plugin SDK):** Out-degree of 3. All core plugins depend on this. API contract must be frozen early.
+- **TSK-016 (Windows Installer):** Highest in-degree node, requiring Plugin Manager, Journaling, and Goals Tracker.
 
 ---
 
 ## 4. Module Breakdown & File Paths
 
-The application structure is mapped to exact relative paths within the project workspace to maintain alignment with the project knowledge graph.
-
 ```
-├── src-tauri/
-│   ├── Cargo.toml
-│   └── src/
-│       ├── main.rs                 # Host Core Entrypoint
-│       ├── biometrics.rs           # Windows Hello Integration
-│       ├── database.rs             # SQLCipher Connection Pool
-│       └── protocol.rs             # Custom URI Scheme Handler
 ├── src/
-│   ├── main.tsx                    # Host Frontend Entrypoint
-│   ├── App.tsx                     # Main Layout & Router
+│   ├── main.tsx
+│   ├── App.tsx
+│   ├── index.css
+│   ├── lib/
+│   │   ├── design-system/
+│   │   │   ├── tokens.css
+│   │   │   ├── typography.css
+│   │   │   └── components.tsx
+│   │   ├── ipc/
+│   │   │   ├── broker.ts
+│   │   │   └── permissions.ts
+│   │   └── commands/
+│   │       └── registry.ts
 │   ├── components/
-│   │   ├── Dashboard.tsx           # Fluent UI Launcher Grid
-│   │   └── PluginSandbox.tsx       # Sandboxed Iframe Wrapper
+│   │   ├── Shell/
+│   │   │   ├── Shell.tsx
+│   │   │   ├── ActivityBar.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── MainContent.tsx
+│   │   │   └── StatusBar.tsx
+│   │   ├── CommandPalette/
+│   │   │   ├── CommandPalette.tsx
+│   │   │   ├── CommandInput.tsx
+│   │   │   └── CommandResults.tsx
+│   │   ├── PluginStore/
+│   │   │   ├── PluginStore.tsx
+│   │   │   ├── PluginCard.tsx
+│   │   │   └── PluginDetail.tsx
+│   │   └── PluginSandbox.tsx
 │   └── hooks/
-│       └── usePluginManager.ts     # Plugin Loading & State Hook
+│       ├── useShellState.ts
+│       ├── useCommandPalette.ts
+│       ├── usePluginManager.ts
+│       └── usePluginStore.ts
 ├── packages/
-│   └── sdk/
+│   ├── sdk/
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── src/
+│   │       └── index.ts
+│   └── template/
 │       ├── package.json
 │       ├── tsconfig.json
 │       └── src/
-│           └── index.ts            # Plugin SDK (IPC Wrapper)
-└── plugins/
-    ├── journal/                    # Journaling Plugin (React)
-    ├── todo/                       # Todo List Plugin (React)
-    └── goals/                      # Goals Tracker Plugin (React)
+│           ├── App.tsx
+│           └── main.tsx
+├── plugins/
+│   ├── journal/
+│   ├── todo/
+│   └── goals/
+└── src-tauri/
+    ├── Cargo.toml
+    ├── tauri.conf.json
+    └── src/
+        ├── main.rs
+        ├── lib.rs
+        ├── biometrics.rs
+        ├── database.rs
+        ├── protocol.rs
 ```
-
-### Module Specifications
-
-#### 1. Host Core Backend (`src-tauri/src/main.rs`)
-
-* **Responsibility:** Initializes the Tauri application, registers custom protocols, and exposes secure commands to the frontend.
-* **Interfaces:**
-  * `fn install_plugin(zip_path: PathBuf) -> Result<PluginManifest, String>`
-  * `fn invoke_biometric_challenge() -> Result<bool, String>`
-
-#### 2. Biometric Manager (`src-tauri/src/biometrics.rs`)
-
-* **Responsibility:** Interfaces with the Windows Biometric Framework using the `windows` crate.
-* **Interfaces:**
-  * Uses `windows::Security::Credentials::UI::UserConsentVerifier` to request biometric verification.
-  * `pub async fn verify_user(prompt: &str) -> Result<bool, windows::core::Error>`
-
-#### 3. Database Manager (`src-tauri/src/database.rs`)
-
-* **Responsibility:** Manages the SQLCipher connection pool and handles cryptographic key operations.
-* **Interfaces:**
-  * `pub fn initialize_db(key: &[u8]) -> Result<Connection, rusqlite::Error>` — Note: implementation uses `rusqlite` with the `bundled-sqlcipher` feature.
-  * Uses the `zeroize` crate to securely wipe the decryption key from memory after database initialization.
-
-#### 4. Plugin Protocol Handler (`src-tauri/src/protocol.rs`)
-
-* **Responsibility:** Registers the `plugin://` custom URI scheme to serve local plugin assets securely.
-* **Security Guardrails:**
-  * Strictly validates that requested paths resolve within `%LOCALAPPDATA%/Aether AppSuite/plugins/`.
-  * Prevents directory traversal attacks (e.g., blocking `..` in paths).
-  * Delivers Content Security Policy (CSP) via response headers on plugin asset responses or via a `<meta>` tag in the served plugin HTML.
-
-#### 5. Host Frontend Dashboard (`src/components/Dashboard.tsx`)
-
-* **Responsibility:** Renders a Fluent UI-compliant grid of installed plugins. Clicking an icon mounts the corresponding plugin inside the sandbox.
-
-#### 6. Plugin Sandbox Wrapper (`src/components/PluginSandbox.tsx`)
-
-* **Responsibility:** Renders the sandboxed `iframe` and establishes the host-side `postMessage` listener.
-* **Attributes:**
-
-    ```html
-    <iframe
-      src="plugin://<plugin-id>/index.html"
-      sandbox="allow-scripts"
-    />
-    ```
-
-    CSP is enforced via response headers from the custom protocol handler or via a `<meta>` tag in the served plugin HTML.
-
-* **Security Notes:**
-  * Validates `event.origin` against the expected `plugin://` scheme origin. Note: `event.origin` behavior for custom protocols may vary across Tauri v2 versions; implement defensive validation and verify at runtime during HITL Gate 1.
-
-#### 7. Plugin SDK (`packages/sdk/src/index.ts`)
-
-* **Responsibility:** Provides a strongly-typed, promise-based API wrapper for plugins to communicate with the host.
-* **Interfaces:**
-  * `sdk.db.get(key: string): Promise<any>`
-  * `sdk.db.set(key: string, value: any): Promise<void>`
-  * `sdk.broker.requestData(targetPlugin: string, query: any): Promise<any>`
 
 ---
 
-## 5. Data Flow & Secure IPC Bridge
+## 5. Plugin Registration Contract
 
-Plugins are completely isolated and cannot access system resources directly. All operations are brokered by the host via a secure `postMessage` protocol.
+Plugins declare their UI integration points via `manifest.json`:
 
-### Sequence Diagram: Gated Data Sharing Broker
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant P as Goals Plugin (Iframe)
-    participant H as Host Frontend (React)
-    participant B as Tauri Backend (Rust)
-    participant DB as SQLCipher DB
-
-    P->>H: postMessage({ type: "BROKER_REQUEST", target: "todo", action: "GET_ACTIVE_TASKS" })
-    Note over H: Validate plugin permissions<br/>against manifest.json
-    alt Permission Denied
-        H-->>P: postMessage({ type: "ERROR", message: "Unauthorized" })
-    else Permission Approved
-        H->>B: invoke("db_query_plugin_data", { plugin_id: "todo", query: "active" })
-        B->>DB: Execute Encrypted Query
-        DB-->>B: Return Rows
-        B-->>H: Return JSON Payload
-        H-->>P: postMessage({ type: "BROKER_RESPONSE", payload: [...] })
-    end
+```json
+{
+  "id": "com.aether.journal",
+  "name": "Journal",
+  "version": "1.0.0",
+  "icon": "📓",
+  "ui": {
+    "activityBar": true,
+    "sidebarSection": "Journal",
+    "commands": [
+      { "id": "new-entry", "title": "New Journal Entry", "keybinding": "Cmd+Shift+N" }
+    ]
+  },
+  "permissions": ["db:read", "db:write"]
+}
 ```
 
-### IPC Message Schema
+### Integration Points
 
-All messages traversing the `postMessage` boundary must conform to the following TypeScript interface:
+| Integration | Manifest Key | Effect |
+|-------------|--------------|--------|
+| Activity Bar | `ui.activityBar: true` | Icon appears in Activity Bar |
+| Sidebar | `ui.sidebarSection` | Section added to Sidebar |
+| Commands | `ui.commands[]` | Commands appear in Command Palette |
+| Permissions | `permissions[]` | Required for Data Broker access |
+
+---
+
+## 6. IPC Message Schema
+
+All messages traversing the `postMessage` boundary:
 
 ```typescript
 interface IPCMessage {
@@ -227,62 +206,89 @@ interface IPCMessage {
 
 ---
 
-## 6. Compliance & Security Guardrails
+## 7. Design Token API
 
-To protect sensitive user data (specifically journal entries and personal goals), the application implements strict security controls:
+CSS custom properties exposed as public contract between host and plugins:
 
-1.  **Data Minimization:**
+```css
+:root {
+  /* Surfaces */
+  --canvas: #040506;
+  --surface-1: #111214;
+  --surface-2: #1b1c1e;
+  --surface-3: #252628;
+  --border: #2e2f32;
 
-  * Plugins are only permitted to read and write data within their own isolated namespace in the database, unless explicit cross-plugin permissions are declared in the manifest and approved by the user.
+  /* Typography */
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6b6b6b;
 
-2.  **Zero Plaintext Storage:**
+  /* Accents */
+  --accent: #55b3ff;
+  --accent-hover: #7ac5ff;
+  --success: #5fc992;
+  --warning: #ffbc33;
+  --danger: #ff5f5f;
 
-  * Journal entries are encrypted at rest using AES-256-GCM via SQLCipher (rusqlite `bundled-sqlcipher`).
-  * No plaintext journal data is ever written to temporary files, cached in unencrypted local storage, or written to application logs.
+  /* Spacing */
+  --sidebar-width: 260px;
+  --activity-bar-width: 64px;
+  --status-bar-height: 24px;
+}
+```
 
-3.  **Biometric Key Release Lifecycle:**
-
-  * The SQLCipher database key is stored in the Windows Credential Manager, encrypted via DPAPI.
-  * The key is only retrieved and loaded into memory after a successful Windows Hello biometric challenge. If Windows Hello is unavailable, the application must degrade gracefully (e.g., prompt for alternative authentication or warn the user).
-  * The key is wrapped in a `Zeroize` struct in Rust, ensuring it is overwritten in physical memory as soon as the database connection pool is initialized.
-
-4.  **Sandbox Isolation:**
-
-  * The custom URI scheme (`plugin://`) enforces a strict Content Security Policy (CSP) delivered via response headers or plugin HTML `<meta>` tags.
-  * Plugins cannot execute external network requests (`connect-src 'none'`), preventing data exfiltration.
+Plugins inherit these automatically. Override allowed but theme preference should be respected.
 
 ---
 
-## 7. Execution Strategy & HITL Gates
+## 8. Compliance & Security Guardrails
 
-The project will progress through structured execution phases. Human-in-the-Loop (HITL) gates are enforced at critical architectural boundaries.
+1. **Data Minimization:** Plugins only access their own namespace unless explicit cross-plugin permissions granted.
+2. **Zero Plaintext Storage:** All sensitive data encrypted at rest via SQLCipher.
+3. **Biometric Key Release:** DB key retrieved from Windows Credential Manager only after successful Windows Hello auth. Zeroized in memory via `zeroize` crate.
+4. **Sandbox Isolation:** `plugin://` scheme enforces strict CSP. No external network requests (`connect-src 'none'`).
+5. **Permission Gating:** All IPC broker requests validated against plugin manifest permissions.
 
-### Phase 1: Core Infrastructure (🔵 Inception)
+---
 
-* **Focus:** Establish the Tauri host, Fluent UI shell, and the custom URI scheme.
-* **Tasks:** TSK-001, TSK-005
-* **HITL Gate 1:** Verify that the custom URI scheme successfully serves static assets into a sandboxed `iframe` without console security errors. Confirm `event.origin` behavior for `plugin://` iframes on Windows 11.
+## 9. Execution Strategy & HITL Gates
 
-### Phase 2: Security & Storage (🟢 Construction)
+### Phase 1: UI Foundation & Design System
 
-* **Focus:** Implement SQLCipher, Windows Hello integration, and the secure key release mechanism.
-* **Tasks:** TSK-002, TSK-003, TSK-004
-* **HITL Gate 2:** Verify that the database cannot be opened without a successful Windows Hello biometric challenge, and confirm that memory zeroization is functioning correctly. Confirm graceful degradation path works when Windows Hello is unavailable.
+- **Focus:** Design tokens, shell, command palette, plugin store.
+- **Tasks:** TSK-001, TSK-002, TSK-003, TSK-004
+- **HITL Gate 1:** Visual regression tests pass, all components render correctly with theme tokens, accessibility audit passes.
 
-### Phase 3: Plugin Runtime & SDK (🟢 Construction)
+### Phase 2: Security & Plugin Runtime
 
-* **Focus:** Build the secure IPC bridge, the data sharing broker, and the Plugin SDK.
-* **Tasks:** TSK-006, TSK-007, TSK-008
-* **HITL Gate 3:** Audit the IPC bridge for potential prototype pollution or directory traversal vulnerabilities. Verify that unauthorized plugins cannot access the database.
+- **Focus:** Tauri host, security, sandbox, IPC bridge, SDK.
+- **Tasks:** TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012
+- **HITL Gate 2:** Database encrypted and accessible only via biometrics. IPC bridge passes security audit. Plugin SDK API contract frozen.
 
-### Phase 4: Plugin Implementation (🟢 Construction)
+### Phase 3: Plugin Implementation
 
-* **Focus:** Develop the three core plugins using the SDK.
-* **Tasks:** TSK-009, TSK-010, TSK-011
-* **HITL Gate 4:** Verify that the Goals plugin can successfully query the Todo plugin's data via the host broker, and that the Journal plugin securely encrypts entries.
+- **Focus:** Build three core plugins with native-feel UI.
+- **Tasks:** TSK-013, TSK-014, TSK-015
+- **HITL Gate 3:** All plugins load, render, and function. Cross-plugin data sharing works (Goals ↔ Todo). Visual consistency verified.
 
-### Phase 5: Packaging & Release (🟡 Operations)
+### Phase 4: Packaging & Release
 
-* **Focus:** Package the application for Windows 11 distribution using a separate build script.
-* **Tasks:** TSK-012
-* **HITL Gate 5:** Perform a clean installation of the NSIS package on a target Windows 11 machine and verify end-to-end functionality (biometrics, plugin import, and local storage).
+- **Focus:** Windows installer, clean install verification.
+- **Tasks:** TSK-016
+- **HITL Gate 4:** Clean install on Windows 11 VM. All features functional. Installer registers protocol and plugins.
+
+---
+
+## 10. Reference Applications
+
+| Application | UI Pattern Borrowed |
+|-------------|---------------------|
+| **VS Code** | Activity Bar, sidebar panels, command palette, status bar |
+| **Obsidian** | CSS variable theming, plugin leaf system, local-first simplicity |
+| **Backstage** | Plugin registration contract, consistent chrome, extension points |
+| **Raycast** | Keyboard-first design, compact mode, action bar, extension store |
+| **Linear** | Ultra-minimal dark UI, accent color, information density |
+| **Notion** | Workspace sidebar, block-based plugin UI, template library |
+| **Figma** | Plugin modal UI, community marketplace pattern |
+| **Arc Browser** | Sidebar-first layout, command bar, translucent surfaces |

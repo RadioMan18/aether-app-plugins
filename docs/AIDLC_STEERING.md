@@ -103,6 +103,12 @@ The audit log provides a traceable history of all workflow actions, stage comple
 
 - **GDPR Compliance:** Enforce data minimization. Prohibit unnecessary data collection. Mandate pseudonymization of user records.
 
+## 7.5. Code Size Guardrail
+
+- **File Size Limit:** No source code file may exceed **400 lines**.
+- **Review Trigger:** After each task, all modified/created files must be checked. If any file exceeds 400 lines, a refactor must be proposed before proceeding.
+- **Rationale:** Keeps components maintainable and testable. Forces decomposition before complexity accumulates.
+
 ## 8. Human-in-the-Loop (HITL) Gates
 
 - **Phase-End Halt:** When all tasks in a Phase are marked `[x]`, you must:

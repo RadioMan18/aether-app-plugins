@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/Shell/Sidebar";
 import { MainContent } from "@/components/Shell/MainContent";
 import { StatusBar } from "@/components/Shell/StatusBar";
 import { CommandPalette } from "@/components/CommandPalette/CommandPalette";
+import { CustomTitleBar } from "@/components/Shell/CustomTitleBar";
 import { PluginStore } from "@/components/PluginStore/PluginStore";
 import { useShellState } from "@/hooks/useShellState";
 import { STORE_ITEMS } from "@/lib/plugin-store/mock-data";
@@ -53,25 +54,28 @@ function App() {
   );
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-canvas text-text-primary">
-      <ActivityBar
-        plugins={MOCK_PLUGINS}
-        activePluginId={shell.activePluginId}
-        onPluginSelect={shell.setActivePluginId}
-      />
-      <Sidebar
-        isOpen={shell.sidebarOpen}
-        isCompact={shell.isCompact}
-        onToggle={shell.toggleSidebar}
-        activePluginId={shell.activePluginId}
-        plugins={MOCK_PLUGINS}
-      />
-      {activePlugin?.id === "plugin-store" ? (
-        <PluginStore items={STORE_ITEMS} />
-      ) : (
-        <MainContent activePlugin={activePlugin} />
-      )}
-      <StatusBar shell={shell} />
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-canvas text-text-primary">
+      <CustomTitleBar />
+      <div className="flex flex-1 overflow-hidden">
+        <ActivityBar
+          plugins={MOCK_PLUGINS}
+          activePluginId={shell.activePluginId}
+          onPluginSelect={shell.setActivePluginId}
+        />
+        <Sidebar
+          isOpen={shell.sidebarOpen}
+          isCompact={shell.isCompact}
+          onToggle={shell.toggleSidebar}
+          activePluginId={shell.activePluginId}
+          plugins={MOCK_PLUGINS}
+        />
+        {activePlugin?.id === "plugin-store" ? (
+          <PluginStore items={STORE_ITEMS} />
+        ) : (
+          <MainContent activePlugin={activePlugin} />
+        )}
+        <StatusBar shell={shell} />
+      </div>
       <CommandPalette
         activePluginId={shell.activePluginId}
         sidebarOpen={shell.sidebarOpen}

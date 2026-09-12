@@ -77,3 +77,22 @@
 - Wired `Open Plugin Store` command in useCommands.ts to `setActivePluginId("plugin-store")`
 - Verified: TypeScript typecheck passes, ESLint passes with 0 errors, Vite production build succeeds (1995 modules, 2.54s)
 - All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
+
+## TSK-005 Completed: Tauri Host Setup & Shell Integration
+
+**Timestamp**: 2026-09-12T13:52:00Z
+**Action**: Completed Tauri Host Setup task. Initialized Tauri v2 project, configured custom title bar, window controls, and IPC skeleton.
+**Details**:
+- Initialized `src-tauri/` with Tauri CLI v2.11.5
+- Created `src-tauri/Cargo.toml` with Tauri v2 dependencies (tauri, tauri-plugin-shell, serde)
+- Created `src-tauri/src/main.rs` as binary entry point
+- Created `src-tauri/src/lib.rs` with `greet` and `get_app_version` IPC commands
+- Created `src-tauri/src/commands.rs` to avoid macro expansion conflicts
+- Configured `src-tauri/tauri.conf.json` with frameless window (`decorations: false`), custom dev URL on port 1420, and `frontendDist: ../dist`
+- Created `src/components/Shell/CustomTitleBar.tsx` with minimize, maximize, and close buttons
+- Wired window controls to Tauri `Window` API (`getCurrentWindow`)
+- Added `@tauri-apps/api` to package.json dependencies
+- Updated `App.tsx` to use `CustomTitleBar` and wrap shell in column layout
+- Verified: `cargo check` passes, TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
+- `npm run tauri dev` launches successfully with Vite dev server and Tauri window
+

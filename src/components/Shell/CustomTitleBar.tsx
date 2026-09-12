@@ -1,0 +1,84 @@
+import { useState, useEffect } from "react";
+import { Minus, Square, X } from "lucide-react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+
+export function CustomTitleBar() {
+  const [isMaximized, setIsMaximized] = useState(false);
+  const windowRef = getCurrentWindow();
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+
+    const setup = async () => {
+      try {
+        const maximized = await windowRef.isMaximized();
+        setIsMaximized(maximized);
+      } catch {
+        // ignore during web-only dev
+      }
+
+      unlisten = await windowRef.onResized(() => {
+        windowRef.isMaximized().then(setIsMaximized).catch(() => {});
+      });
+    };
+
+    setup();
+
+    return () => {
+      if (unlisten) {
+        unlisten();
+      }
+    };
+  }, [windowRef]);
+
+  const handleMinimize = async () => {
+    await windowRef.minimize();
+  };
+
+  const handleMaximize = async () => {
+    if (isMaximized) {
+      await windowRef.unmaximize();
+    } else {
+      await windowRef.maximize();
+    }
+  };
+
+  const handleClose = async () => {
+    await windowRef.close();
+  };
+
+  return (
+    <div
+      data-tauri-drag-region
+      className="flex h-8 w-full select-none items-center justify-between border-b border-border bg-surface-1"
+    >
+      <div className="flex items-center gap-2 px-3" data-tauri-drag-region>
+        <span className="text-sm font-medium text-text-primary">Aether</span>
+      </div>
+
+      <div className="flex items-center">
+        <button
+          onClick={handleMinimize}
+          className="flex h-8 w-10 items-center justify-center text-text-muted transition-colors duration-150 hover:bg-surface-2 hover:text-text-primary"
+          aria-label="Minimize"
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={handleMaximize}
+          className="flex h-8 w-10 items-center justify-center text-text-muted transition-colors duration-150 hover:bg-surface-2 hover:text-text-primary"
+          aria-label={isMaximized ? "Restore" : "Maximize"}
+        >
+          <Square className="h-3 w-3" />
+        </button>
+        <button
+          onClick={handleClose}
+          className="flex h-8 w-10 items-center justify-center text-text-muted transition-colors duration-150 hover:bg-danger hover:text-white"
+          aria-label="Close"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}

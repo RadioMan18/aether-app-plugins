@@ -13,4 +13,5 @@ export interface PluginManifest {
     }>;
   };
   permissions?: string[];
+  sandboxed?: boolean;
 }

@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { PluginSandbox } from "@/components/PluginSandbox";
 import type { PluginManifest } from "@/types/plugin";
 
 interface MainContentProps {
@@ -37,12 +38,21 @@ export function MainContent({ activePlugin }: MainContentProps) {
               </div>
             </div>
             <div className="flex-1 p-6">
-              <div className="rounded-lg border border-border bg-surface-1 p-6">
-                <p className="text-text-secondary">
-                  Plugin content for <span className="font-medium text-text-primary">{activePlugin.name}</span> will be
-                  rendered here.
-                </p>
-              </div>
+              {activePlugin.sandboxed ? (
+                <div className="h-full overflow-hidden rounded-lg border border-border">
+                  <PluginSandbox
+                    src={`plugin://localhost/${activePlugin.id}/index.html`}
+                    title={activePlugin.name}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-lg border border-border bg-surface-1 p-6">
+                  <p className="text-text-secondary">
+                    Plugin content for <span className="font-medium text-text-primary">{activePlugin.name}</span> will be
+                    rendered here.
+                  </p>
+                </div>
+              )}
             </div>
           </MotionDiv>
         ) : (

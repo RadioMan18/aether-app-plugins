@@ -18,6 +18,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     icon: "📓",
     ui: { activityBar: true, sidebarSection: "Journal" },
     permissions: ["db:read", "db:write"],
+    sandboxed: true,
   },
   {
     id: "todo",
@@ -26,6 +27,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     icon: "✅",
     ui: { activityBar: true, sidebarSection: "Todo" },
     permissions: ["db:read", "db:write"],
+    sandboxed: true,
   },
   {
     id: "goals",
@@ -34,6 +36,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     icon: "🎯",
     ui: { activityBar: true, sidebarSection: "Goals" },
     permissions: ["db:read"],
+    sandboxed: true,
   },
   {
     id: "plugin-store",

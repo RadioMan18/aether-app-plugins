@@ -148,3 +148,26 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
 - All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
 
+## TSK-009 Completed: Custom URI Scheme & Sandboxed Plugin Iframe
+
+**Timestamp**: 2026-09-12T18:25:00Z
+**Action**: Completed Custom URI Scheme & Sandboxed Plugin Iframe task. Registered `plugin://` URI scheme with path validation, CSP headers, and created PluginSandbox React component.
+**Details**:
+- Created `src-tauri/src/protocol.rs` with `PluginProtocol` struct and `handler` function
+- Registered `plugin://` scheme via Tauri v2 `register_uri_scheme_protocol` API with `UriSchemeContext<'_, R>` generic
+- Implemented path validation using `std::fs::canonicalize` to prevent directory traversal attacks
+- Blocks directory listing requests and returns 403 for path traversal attempts
+- Returns 404 HTML body for missing assets instead of bare empty response
+- Added Content-Type detection for common plugin assets (html, js, css, json, png, jpg, svg, ico, woff, wasm)
+- Added `Content-Security-Policy` response header: `default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none';`
+- Created `src/components/PluginSandbox.tsx` with iframe using `sandbox="allow-scripts"` attribute
+- Created `src/types/plugin.ts` — added optional `sandboxed?: boolean` to `PluginManifest`
+- Updated `src/components/Shell/MainContent.tsx` — renders `PluginSandbox` for `sandboxed` plugins
+- Updated `src/App.tsx` — marked journal, todo, and goals plugins as `sandboxed: true`
+- Verified: `cargo check` passes with 0 errors, `cargo clippy -D warnings` passes with 0 warnings, `cargo fmt` passes
+- Fixed `UriSchemeContext` generic parameter `R: tauri::Runtime` for Tauri v2.11.5 API
+- Added `use tauri::Manager` import for `.path().app_data_dir()` access on `AppHandle`
+- Fixed React JSX `srcdoc` → `srcDoc` TypeScript error
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2003 modules)
+- All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
+

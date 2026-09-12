@@ -39,6 +39,12 @@ export function useCommands({
           action: () => setActivePluginId("goals"),
         };
       }
+      if (command.id === "open-plugin-store") {
+        return {
+          ...command,
+          action: () => setActivePluginId("plugin-store"),
+        };
+      }
       return command;
     });
   }, [setActivePluginId, toggleSidebar]);

@@ -4,7 +4,9 @@ import { Sidebar } from "@/components/Shell/Sidebar";
 import { MainContent } from "@/components/Shell/MainContent";
 import { StatusBar } from "@/components/Shell/StatusBar";
 import { CommandPalette } from "@/components/CommandPalette/CommandPalette";
+import { PluginStore } from "@/components/PluginStore/PluginStore";
 import { useShellState } from "@/hooks/useShellState";
+import { STORE_ITEMS } from "@/lib/plugin-store/mock-data";
 import type { PluginManifest } from "@/types/plugin";
 
 const MOCK_PLUGINS: PluginManifest[] = [
@@ -32,6 +34,14 @@ const MOCK_PLUGINS: PluginManifest[] = [
     ui: { activityBar: true, sidebarSection: "Goals" },
     permissions: ["db:read"],
   },
+  {
+    id: "plugin-store",
+    name: "Plugin Store",
+    version: "1.0.0",
+    icon: "🧩",
+    ui: { activityBar: true },
+    permissions: [],
+  },
 ];
 
 function App() {
@@ -56,7 +66,11 @@ function App() {
         activePluginId={shell.activePluginId}
         plugins={MOCK_PLUGINS}
       />
-      <MainContent activePlugin={activePlugin} />
+      {activePlugin?.id === "plugin-store" ? (
+        <PluginStore items={STORE_ITEMS} />
+      ) : (
+        <MainContent activePlugin={activePlugin} />
+      )}
       <StatusBar shell={shell} />
       <CommandPalette
         activePluginId={shell.activePluginId}

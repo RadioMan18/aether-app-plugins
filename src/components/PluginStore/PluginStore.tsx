@@ -1,0 +1,151 @@
+import { useMemo } from "react";
+import { Input } from "@/lib/design-system/components";
+import { Search } from "lucide-react";
+import { usePluginStore } from "@/hooks/usePluginStore";
+import type { StoreItem, StoreCategory, StoreTab } from "@/types/plugin-store";
+import { PluginCard } from "./PluginCard";
+import { PluginDetail } from "./PluginDetail";
+
+const CATEGORIES: { value: StoreCategory; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "productivity", label: "Productivity" },
+  { value: "security", label: "Security" },
+  { value: "integration", label: "Integration" },
+  { value: "developer-tools", label: "Developer Tools" },
+];
+
+const TABS: { value: StoreTab; label: string }[] = [
+  { value: "discover", label: "Discover" },
+  { value: "installed", label: "Installed" },
+  { value: "updates", label: "Updates" },
+];
+
+interface PluginStoreProps {
+  items: StoreItem[];
+}
+
+export function PluginStore({ items }: PluginStoreProps) {
+  const {
+    query,
+    setQuery,
+    category,
+    setCategory,
+    tab,
+    setTab,
+    filteredItems,
+    selectedItem,
+    setSelectedItem,
+    install,
+    uninstall,
+  } = usePluginStore(items);
+
+  const updatesCount = useMemo(
+    () => items.filter((item) => item.updateAvailable).length,
+    [items]
+  );
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="border-b border-border px-6 py-5">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-text-primary">Plugin Store</h1>
+            <p className="text-sm text-text-secondary">
+              Discover and manage plugins for Aether
+            </p>
+          </div>
+          <div className="relative w-80">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+            <Input
+              type="search"
+              placeholder="Search plugins..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setCategory(cat.value)}
+                className={[
+                  "rounded-md px-3 py-1.5 text-sm transition-colors duration-150",
+                  category === cat.value
+                    ? "bg-accent/10 text-accent"
+                    : "text-text-secondary hover:bg-surface-2 hover:text-text-primary",
+                ].join(" ")}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-surface-1 p-1">
+            {TABS.map((t) => (
+              <button
+                key={t.value}
+                onClick={() => setTab(t.value)}
+                className={[
+                  "relative rounded-md px-3 py-1.5 text-sm transition-colors duration-150",
+                  tab === t.value
+                    ? "text-text-primary"
+                    : "text-text-secondary hover:text-text-primary",
+                ].join(" ")}
+              >
+                {t.label}
+                {t.value === "updates" && updatesCount > 0 && (
+                  <span className="ml-1.5 rounded-full bg-accent px-1.5 py-0.5 text-xs text-canvas">
+                    {updatesCount}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+          {filteredItems.length === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <p className="text-lg font-medium text-text-primary">No plugins found</p>
+                <p className="mt-1 text-sm text-text-secondary">
+                  Try adjusting your search or filter criteria.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredItems.map((item) => (
+                <PluginCard
+                  key={item.id}
+                  item={item}
+                  onSelect={() => setSelectedItem(item)}
+                  onInstall={() => install(item.id)}
+                  onUninstall={() => uninstall(item.id)}
+                  isSelected={selectedItem?.id === item.id}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {selectedItem && (
+          <div className="w-96 border-l border-border bg-surface-1 overflow-y-auto scrollbar-thin">
+            <PluginDetail
+              item={selectedItem}
+              onClose={() => setSelectedItem(null)}
+              onInstall={() => install(selectedItem.id)}
+              onUninstall={() => uninstall(selectedItem.id)}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

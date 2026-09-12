@@ -61,3 +61,19 @@
 - Wired palette into App.tsx with actual plugin switching and sidebar toggle actions
 - Verified: TypeScript typecheck passes, ESLint passes with 0 errors, Vite production build succeeds (1990 modules, 2.56s)
 - All source files under 400 lines (largest: components.tsx at 148 lines)
+
+## TSK-004 Completed: Plugin Store UI & Discovery Experience
+
+**Timestamp**: 2026-09-12T01:12:00Z
+**Action**: Completed Plugin Store task. Implemented store view, card grid, category filtering, search, detail panel, and install/uninstall flow.
+**Details**:
+- Created `src/types/plugin-store.ts` with StoreItem, StoreCategory, and StoreTab types
+- Created `src/lib/plugin-store/mock-data.ts` with 10 mock plugins across 4 categories
+- Created `src/hooks/usePluginStore.ts` with search, category filter, tab state, and install/uninstall logic
+- Created `src/components/PluginStore/PluginStore.tsx` as main view with search bar, category chips, tab bar, and card grid
+- Created `src/components/PluginStore/PluginCard.tsx` with plugin info, rating, install/update/remove actions
+- Created `src/components/PluginStore/PluginDetail.tsx` with slide-in detail panel showing permissions, changelog, and action buttons
+- Added `plugin-store` pseudo-plugin to MOCK_PLUGINS in App.tsx with Activity Bar icon
+- Wired `Open Plugin Store` command in useCommands.ts to `setActivePluginId("plugin-store")`
+- Verified: TypeScript typecheck passes, ESLint passes with 0 errors, Vite production build succeeds (1995 modules, 2.54s)
+- All source files under 400 lines (largest: PluginStore.tsx at 151 lines)

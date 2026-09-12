@@ -96,3 +96,20 @@
 - Verified: `cargo check` passes, TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
 - `npm run tauri dev` launches successfully with Vite dev server and Tauri window
 
+## TSK-006 Completed: SQLCipher Database Integration
+
+**Timestamp**: 2026-09-12T14:45:00Z
+**Action**: Completed SQLCipher Database Integration task. Added rusqlite with bundled-sqlcipher, encryption key management, and schema initialization.
+**Details**:
+- Added `rusqlite`, `hex`, `rand`, and `dirs` dependencies to `src-tauri/Cargo.toml` with `bundled-sqlcipher`, `chrono`, and `uuid` features
+- Created `src-tauri/src/database.rs` with `Database` struct wrapping `Mutex<Connection>` for thread-safe access
+- Implemented AES-256 encryption key generation with `rand::thread_rng()` and hex encoding for `PRAGMA key`
+- Added `get_or_create_key` to persist 32-byte key file in app data directory
+- Implemented `PRAGMA cipher_integrity_check` validation after opening encrypted database
+- Created `src-tauri/src/schema.sql` with tables for `journal_entries`, `todos`, `goals`, and `metadata`
+- Exposed `initialize_database` and `get_database_info` Tauri commands in `commands.rs`
+- Auto-initializes database in `lib.rs` setup hook
+- Verified: `cargo check` passes with 0 errors, `cargo clippy` passes with 0 errors, `cargo fmt` passes
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2002 modules)
+- All source files under 400 lines (largest: PluginStore.tsx at 151 lines)
+

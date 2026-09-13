@@ -147,6 +147,34 @@ pub fn uninstall_plugin(app: AppHandle, id: String) -> Result<(), String> {
     db.remove_plugin_files(app_data_dir, &id)
 }
 
+#[tauri::command]
+pub fn seed_builtin_plugins(app: AppHandle) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+
+    let builtins = [
+        (
+            "journal",
+            "Journal",
+            "1.0.0",
+            vec!["db:read".to_string(), "db:write".to_string()],
+        ),
+        (
+            "todo",
+            "Todo List",
+            "1.0.0",
+            vec!["db:read".to_string(), "db:write".to_string()],
+        ),
+        ("goals", "Goals", "1.0.0", vec!["db:read".to_string()]),
+    ];
+
+    for (id, name, version, permissions) in builtins {
+        db.register_plugin(id, name, version, &permissions)?;
+    }
+
+    Ok(())
+}
+
 fn get_app_data_dir(_app: &AppHandle) -> Result<PathBuf, String> {
     let app_data_dir = dirs::data_dir()
         .ok_or_else(|| "Failed to determine app data directory".to_string())?

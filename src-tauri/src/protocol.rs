@@ -21,10 +21,9 @@ impl PluginProtocol {
         ctx: UriSchemeContext<'_, R>,
         request: tauri::http::Request<Vec<u8>>,
     ) -> tauri::http::Response<Vec<u8>> {
-        let plugins_dir = match Self::plugins_dir(ctx) {
-            Some(dir) => dir,
-            None => return Self::not_found("Plugins directory not available"),
-        };
+        let plugins_dir = Self::dev_plugins_dir()
+            .or_else(|| Self::plugins_dir(ctx))
+            .unwrap_or_else(|| PathBuf::from("plugins"));
 
         let path = request.uri().path();
         let relative_path = path.strip_prefix('/').unwrap_or(path);
@@ -39,7 +38,8 @@ impl PluginProtocol {
             Err(_) => return Self::not_found("Plugin asset not found"),
         };
 
-        if !resolved.starts_with(&plugins_dir) {
+        let allowed_base = plugins_dir.canonicalize().unwrap_or(plugins_dir);
+        if !resolved.starts_with(&allowed_base) {
             return Self::forbidden("Path traversal detected");
         }
 
@@ -66,6 +66,10 @@ impl PluginProtocol {
         let plugins_dir = app_data.join("plugins");
         std::fs::create_dir_all(&plugins_dir).ok()?;
         Some(plugins_dir)
+    }
+
+    fn dev_plugins_dir() -> Option<PathBuf> {
+        std::env::var("AETHER_PLUGIN_DIR").ok().map(PathBuf::from)
     }
 
     fn not_found(message: &str) -> tauri::http::Response<Vec<u8>> {

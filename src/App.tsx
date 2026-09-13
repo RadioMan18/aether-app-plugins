@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { ActivityBar } from "@/components/Shell/ActivityBar";
 import { Sidebar } from "@/components/Shell/Sidebar";
 import { MainContent } from "@/components/Shell/MainContent";
@@ -9,6 +9,7 @@ import { PluginStore } from "@/components/PluginStore/PluginStore";
 import { useShellState } from "@/hooks/useShellState";
 import { STORE_ITEMS } from "@/lib/plugin-store/mock-data";
 import type { PluginManifest } from "@/types/plugin";
+import { invoke } from "@tauri-apps/api/core";
 
 const MOCK_PLUGINS: PluginManifest[] = [
   {
@@ -50,6 +51,22 @@ const MOCK_PLUGINS: PluginManifest[] = [
 
 function App() {
   const shell = useShellState(MOCK_PLUGINS);
+
+  useEffect(() => {
+    const seed = async () => {
+      try {
+        await invoke("seed_builtin_plugins");
+      } catch {
+        // Ignore seed errors during early startup
+      }
+    };
+
+    seed();
+
+    return () => {
+      // cleanup
+    };
+  }, []);
 
   const activePlugin = useMemo(
     () => MOCK_PLUGINS.find((plugin) => plugin.id === shell.activePluginId) ?? null,

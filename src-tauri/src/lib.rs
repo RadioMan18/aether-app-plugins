@@ -33,7 +33,8 @@ pub fn run() {
             commands::plugin_ipc,
             commands::install_plugin,
             commands::list_plugins,
-            commands::uninstall_plugin
+            commands::uninstall_plugin,
+            commands::seed_builtin_plugins
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

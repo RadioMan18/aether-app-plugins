@@ -235,3 +235,25 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors
 - All source files under 400 lines (largest: PluginStore.tsx at 183 lines)
 
+## TSK-013 Completed: Journaling Plugin (Encrypted, Native-Feel UI)
+
+**Timestamp**: 2026-09-13T16:30:00Z
+**Action**: Completed Journaling Plugin task. Built journal plugin with React, SDK integration, and encrypted database persistence.
+**Details**:
+- Created `plugins/journal/index.html` entry point with dark theme styles
+- Created `plugins/journal/src/main.tsx` React entry point
+- Created `plugins/journal/src/App.tsx` with entry list, editor, and CRUD operations
+- Created `plugins/journal/src/Editor.tsx` with title and content editing, auto-save on blur
+- Created `plugins/journal/src/components/EntryList.tsx` with entry previews and delete functionality
+- Plugin uses SDK `db.query` and `db.execute` for all database operations
+- All journal data stored in encrypted SQLCipher database via host IPC
+- Added `seed_builtin_plugins` Tauri command to register journal, todo, and goals plugins
+- Updated `src-tauri/src/commands.rs` with `seed_builtin_plugins` command
+- Updated `src-tauri/src/lib.rs` to register `seed_builtin_plugins` in invoke handler
+- Updated `src/App.tsx` to call `seed_builtin_plugins` on startup
+- Updated `open-ui.bat` to set `AETHER_PLUGIN_DIR` for development plugin loading
+- Updated `src-tauri/src/protocol.rs` to support `AETHER_PLUGIN_DIR` environment variable for dev mode
+- Verified: `cargo check` passes with 0 errors, `cargo clippy -D warnings` passes with 0 warnings, `cargo fmt` passes
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors
+- All source files under 400 lines (largest: PluginStore.tsx at 183 lines)
+

@@ -198,7 +198,7 @@ pub fn seed_builtin_plugins(app: AppHandle) -> Result<(), String> {
             "1.0.0",
             vec!["db:read".to_string(), "db:write".to_string()],
         ),
-        ("goals", "Goals", "1.0.0", vec!["db:read".to_string()]),
+        ("goals", "Goals", "1.0.0", vec!["db:read".to_string(), "db:write".to_string()]),
     ];
 
     for (id, name, version, permissions) in builtins {

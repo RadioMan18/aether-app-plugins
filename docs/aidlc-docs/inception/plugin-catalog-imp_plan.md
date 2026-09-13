@@ -1,0 +1,733 @@
+---
+project_name: "Technical Architecture Plan: Aether App Suite — Plugin Catalog Expansion"
+critical_path: "TSK-004 → TSK-008 → TSK-015"
+total_cost: 82.80
+bottlenecks: "TSK-015"
+shortest_path: "TSK-007 → TSK-015"
+total_tasks: 15
+phases: 3
+---
+
+# Technical Architecture Plan: Aether App Suite — Plugin Catalog Expansion — Implementation Plan
+
+## 1. Project Overview
+
+Technical specification for Technical Architecture Plan: Aether App Suite — Plugin Catalog Expansion.
+
+**Technology Stack:**
+
+- TypeScript
+- React
+- Tailwind CSS
+- Mermaid.js
+- ESLint
+- Vite
+- Requests
+- Tauri
+
+## 2. Graph-Based Task Analysis
+
+### 2.1 Task Decomposition
+
+The project is decomposed into 15 discrete tasks. Each task is assigned a weight using the formula:
+
+$$\text{Weight} = \text{Estimated Hours} \times \text{Complexity Factor} \times \text{Risk Factor}$$
+
+| Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Dependencies |
+| --------- | --------- | ---------- | ---------- | ---- | ------ | ------------ |
+| TSK-001 | Data Broker API Extension (JSON Schema Val... | 12.0 | 1.8 | 1.3 | 28.08 | None |
+| TSK-002 | Host-Mediated RSS Background Fetch Service | 16.0 | 2.0 | 1.5 | 48.00 | None |
+| TSK-003 | Host-Active Clipboard Streaming Service | 10.0 | 1.8 | 1.4 | 25.20 | None |
+| TSK-004 | Independent Biometric Challenge & Auto-Rel... | 14.0 | 2.2 | 1.6 | 49.28 | None |
+| TSK-005 | Calendar / Scheduler Plugin | 14.0 | 1.8 | 1.3 | 32.76 | TSK-001 |
+| TSK-006 | Kanban / Project Board Plugin | 14.0 | 1.6 | 1.2 | 26.88 | TSK-001 |
+| TSK-007 | Pomodoro / Focus Timer Plugin | 8.0 | 1.3 | 1.0 | 10.40 | None |
+| TSK-008 | Linked Notes / Knowledge Graph Plugin | 18.0 | 2.2 | 1.5 | 59.40 | TSK-004 |
+| TSK-009 | Password / Secrets Vault Plugin | 10.0 | 1.8 | 1.6 | 28.80 | TSK-004 |
+| TSK-010 | Budget / Expense Tracker Plugin | 12.0 | 1.5 | 1.2 | 21.60 | TSK-001 |
+| TSK-011 | Mood / Wellness Tracker Plugin | 8.0 | 1.2 | 1.0 | 9.60 | None |
+| TSK-012 | Contacts / Mini-CRM Plugin | 10.0 | 1.4 | 1.0 | 14.00 | None |
+| TSK-013 | Clipboard Manager / Snippet Vault Plugin | 9.0 | 1.6 | 1.3 | 18.72 | TSK-003 |
+| TSK-014 | Read-It-Later / RSS Reader Plugin | 10.0 | 1.4 | 1.8 | 25.20 | TSK-002 |
+| TSK-015 | Integration Smoke Testing & Verification | 12.0 | 1.5 | 1.3 | 23.40 | TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012, TSK-013, TSK-014 |
+
+### 2.2 Critical Path Analysis (CPM)
+
+The Critical Path determines the minimum project duration. It is the longest path through the DAG.
+
+- **Critical Path:** TSK-004 $\rightarrow$ TSK-008 $\rightarrow$ TSK-015
+- **Total Weighted Duration:** 82.80 hours
+- **Bottleneck:** TSK-015 (highest in-degree node on critical path)
+
+Using Dijkstra's algorithm to find the path of least resistance (minimum weight) to the integration milestone:
+
+- **Shortest Path:** TSK-007 $\rightarrow$ TSK-015
+- **Weighted Cost:** 23.40 hours
+
+## 3. Execution Strategy
+
+> **Phase Gate Policy:** Each phase concludes with a mandatory **Testing Gate**.
+> The gate must return **ALL GREEN** (zero errors, zero warnings) before the next phase may begin.
+> If any check fails, the current phase must be remediated and the gate re-run.
+
+### Phase 1: Backend & Frontend (TSK-001 to TSK-012)
+
+**Tasks:** TSK-001, TSK-002, TSK-003, TSK-004, TSK-007, TSK-011, TSK-012
+
+#### `TSK-001`: Data Broker API Extension (JSON Schema Validation)
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 12.0 |
+| Complexity | 1.8 |
+| Risk | 1.3 |
+| Weight | 28.08 |
+| Module | `src-tauri/src/ipc.rs` |
+| Dependencies | None |
+
+**Objective:**
+
+Extend the core Data Broker in the Tauri host to support a standardized, read-only query API for cross-plugin communication. Integrate the jsonschema crate to validate incoming query payloads against predefined schemas before execution.
+
+**Technical Approach:**
+
+Integrate the jsonschema crate in Rust. Define static JSON schemas for allowed cross-plugin queries (e.g., todo:get_tasks, goals:get_milestones) in src-tauri/schemas/. Intercept incoming IPC requests in ipc.rs. Validate the payload against the corresponding schema before executing the query. Reject invalid payloads with descriptive, non-sensitive error messages.
+
+**Files to Create/Modify:**
+
+- `src-tauri/src/ipc.rs`
+- `src-tauri/schemas/todo_get_tasks.json`
+- `src-tauri/schemas/goals_get_milestones.json`
+- `src-tauri/tests/ipc_tests.rs`
+
+**Acceptance Criteria:**
+
+- [ ] Host successfully parses and validates incoming query payloads against JSON schemas.
+- [ ] Malformed payloads are rejected immediately with a 400 Bad Request equivalent IPC error.
+- [ ] Authorized, valid queries successfully return read-only datasets to the requesting plugin.
+
+**Testing Requirements:**
+
+Write unit tests in src-tauri/tests/ipc_tests.rs to verify validation of valid and invalid payloads. Ensure that unauthorized queries are blocked and return appropriate error codes. Target 85% code coverage for the validation module.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+#### `TSK-002`: Host-Mediated RSS Background Fetch Service
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 16.0 |
+| Complexity | 2.0 |
+| Risk | 1.5 |
+| Weight | 48.00 |
+| Module | `src-tauri/src/rss.rs` |
+| Dependencies | None |
+
+**Objective:**
+
+Implement a secure, background RSS fetch service on the Rust host that reads feed URLs from a user-editable configuration file, fetches them, and writes them directly to the plugin's encrypted SQLCipher partition.
+
+**Technical Approach:**
+
+Create a background thread/worker in Rust using tokio and reqwest. Read feed URLs from a user-editable configuration file (feeds.json) located in the local app data directory (%APPDATA%/aether/feeds.json). Fetch XML feeds, parse them into a structured JSON format, and write them directly to the RSS plugin's SQLCipher database partition. Ensure the plugin iframe's CSP remains strictly set to connect-src 'none'.
+
+**Files to Create/Modify:**
+
+- `src-tauri/src/rss.rs`
+- `src-tauri/src/lib.rs`
+- `src-tauri/tests/rss_tests.rs`
+
+**Acceptance Criteria:**
+
+- [ ] Background service successfully reads URLs from %APPDATA%/aether/feeds.json.
+- [ ] Feeds are fetched, parsed, and written to the encrypted SQLCipher partition without blocking the main thread.
+- [ ] The RSS Reader plugin can read the data from its partition without making outbound network requests.
+
+**Testing Requirements:**
+
+Write integration tests in src-tauri/tests/rss_tests.rs using mock HTTP servers (e.g., wiremock) to simulate RSS feeds. Verify parsing of various RSS/Atom formats and database insertion. Target 80% coverage.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+#### `TSK-003`: Host-Active Clipboard Streaming Service
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 10.0 |
+| Complexity | 1.8 |
+| Risk | 1.4 |
+| Weight | 25.20 |
+| Module | `src-tauri/src/clipboard.rs` |
+| Dependencies | None |
+
+**Objective:**
+
+Implement a host-side clipboard listener that monitors the OS clipboard, filters for plain text/HTML, and actively streams changes to authorized plugins.
+
+**Technical Approach:**
+
+Use native Tauri clipboard APIs or a specialized crate (e.g., clipboard-master) to listen for OS clipboard changes. Filter out non-textual data (e.g., files, images, rich binary formats) to prevent performance degradation and security leaks. Stream plain text/HTML updates to the frontend via Tauri events. Expose a permission gate (clipboard:subscribe) in the plugin manifest.
+
+**Files to Create/Modify:**
+
+- `src-tauri/src/clipboard.rs`
+- `src-tauri/src/ipc.rs`
+- `src-tauri/tests/clipboard_tests.rs`
+
+**Acceptance Criteria:**
+
+- [ ] Host successfully detects clipboard changes and filters out non-text/HTML data.
+- [ ] Changes are streamed to the frontend only if the active plugin has the clipboard:subscribe permission.
+- [ ] A clear, non-intrusive visual notice is displayed to the user when clipboard streaming is active.
+
+**Testing Requirements:**
+
+Write unit tests in src-tauri/tests/clipboard_tests.rs to mock clipboard events and verify that only text/HTML data is propagated. Verify that permission checks correctly block unauthorized subscribers.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+#### `TSK-004`: Independent Biometric Challenge & Auto-Relock
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 14.0 |
+| Complexity | 2.2 |
+| Risk | 1.6 |
+| Weight | 49.28 |
+| Module | `src-tauri/src/biometrics.rs` |
+| Dependencies | None |
+
+**Objective:**
+
+Implement a dedicated biometric challenge handler for high-sensitivity plugins (Linked Notes, Password Vault). Ensure keys are zeroized and partitions are relocked immediately when the user leaves the plugin.
+
+**Technical Approach:**
+
+Extend biometrics.rs to support independent, named biometric challenges via Windows Hello (UserConsentVerifier). On successful verification, release the specific partition key from the Windows Credential Manager, unlock the SQLCipher partition, and hold the key in memory using the zeroize crate. Implement an explicit lock_partition command. Trigger this command from the frontend when the plugin iframe is unmounted, loses focus, or when the user switches active views. Zeroize the key buffer in memory immediately upon relocking.
+
+**Files to Create/Modify:**
+
+- `src-tauri/src/biometrics.rs`
+- `src-tauri/src/database.rs`
+- `src-tauri/tests/biometrics_tests.rs`
+
+**Acceptance Criteria:**
+
+- [ ] Opening Linked Notes or Password Vault triggers a dedicated Windows Hello prompt.
+- [ ] Navigating away from the plugin immediately triggers the lock_partition command.
+- [ ] Memory inspection confirms the partition key is zeroized and the database connection is closed/invalidated upon relock.
+
+**Testing Requirements:**
+
+Write unit tests in src-tauri/tests/biometrics_tests.rs to verify that the zeroize crate successfully clears memory buffers. Mock the Windows Hello API to test success and failure flows.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+#### `TSK-007`: Pomodoro / Focus Timer Plugin
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 8.0 |
+| Complexity | 1.3 |
+| Risk | 1.0 |
+| Weight | 10.40 |
+| Module | `plugins/pomodoro/src/index.tsx` |
+| Dependencies | None |
+
+**Objective:**
+
+Build a lightweight, self-contained focus timer.
+
+**Technical Approach:**
+
+Implement a standard Pomodoro timer with customizable intervals using React state and standard Web APIs (setInterval). Broadcast session completion events to the Data Broker for other plugins to optionally consume.
+
+**Files to Create/Modify:**
+
+- `plugins/pomodoro/src/index.tsx`
+- `plugins/pomodoro/src/hooks/useTimer.ts`
+- `plugins/pomodoro/tests/pomodoro.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Timer counts down accurately and supports customizable intervals (work, short break, long break).
+- [ ] Broadcasts session completion events to the Data Broker.
+- [ ] Plays a non-intrusive audio notification or visual cue when a session ends.
+
+**Testing Requirements:**
+
+Write unit tests for the useTimer hook using Vitest. Fast-forward timers using fake timers to verify state transitions and event broadcasts.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+#### `TSK-011`: Mood / Wellness Tracker Plugin
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 8.0 |
+| Complexity | 1.2 |
+| Risk | 1.0 |
+| Weight | 9.60 |
+| Module | `plugins/mood/src/index.tsx` |
+| Dependencies | None |
+
+**Objective:**
+
+Build a self-contained daily wellness check-in tool.
+
+**Technical Approach:**
+
+Create a clean, visual interface for logging mood, sleep, and energy levels. Persist data locally within its isolated SQLCipher partition.
+
+**Files to Create/Modify:**
+
+- `plugins/mood/src/index.tsx`
+- `plugins/mood/src/components/MoodSelector.tsx`
+- `plugins/mood/tests/mood.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Allows logging daily mood, sleep hours, and energy levels.
+- [ ] Persists data locally within its isolated SQLCipher partition.
+- [ ] Renders simple historical charts of mood trends.
+
+**Testing Requirements:**
+
+Write component tests to verify that mood selections are correctly saved to the local database. Test rendering of trend charts with mock historical data.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+#### `TSK-012`: Contacts / Mini-CRM Plugin
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 10.0 |
+| Complexity | 1.4 |
+| Risk | 1.0 |
+| Weight | 14.00 |
+| Module | `plugins/contacts/src/index.tsx` |
+| Dependencies | None |
+
+**Objective:**
+
+Build a lightweight contact and relationship manager.
+
+**Technical Approach:**
+
+Implement contact CRUD, tagging, and interaction logging. Persist data locally within its isolated SQLCipher partition.
+
+**Files to Create/Modify:**
+
+- `plugins/contacts/src/index.tsx`
+- `plugins/contacts/src/components/ContactList.tsx`
+- `plugins/contacts/tests/contacts.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Supports full CRUD operations for contacts.
+- [ ] Allows tagging contacts and logging interaction history.
+- [ ] Persists data locally within its isolated SQLCipher partition.
+
+**Testing Requirements:**
+
+Write integration tests for contact creation, updating, and deletion. Verify that tags are correctly associated and queried.
+
+**Integration Notes:**
+
+No upstream dependencies — this is a foundational task.
+
+> **GATE 1 — Validation**
+>
+> | Check | Tool | Pass Criteria |
+> | ----- | ---- | -------------- |
+> | JS Linting | `eslint ui/**/*.js` | Zero errors |
+> | JS Formatting | `prettier --check ui/**/*.js` | No unformatted files |
+> | CSS Linting | `stylelint ui/**/*.css` | Zero warnings |
+> | Unit Tests | `pytest tests/` | 100% pass rate |
+> | Dependency Audit | `pip-audit` | No known vulnerabilities |
+>
+> **Status:** ⬜ PENDING
+
+### Phase 2: Frontend & Finalization (TSK-005 to TSK-014)
+
+**Tasks:** TSK-005, TSK-006, TSK-008, TSK-009, TSK-010, TSK-013, TSK-014
+
+#### `TSK-005`: Calendar / Scheduler Plugin — depends on TSK-001
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 14.0 |
+| Complexity | 1.8 |
+| Risk | 1.3 |
+| Weight | 32.76 |
+| Module | `plugins/calendar/src/index.tsx` |
+| Dependencies | `TSK-001` |
+
+**Objective:**
+
+Build a calendar interface that aggregates tasks and goals from other plugins using the Data Broker's read-only query API.
+
+**Technical Approach:**
+
+Use the extended SDK to query todo:get_tasks and goals:get_milestones. Render them on a responsive monthly/weekly calendar grid built with Tailwind CSS and shadcn/ui. Implement custom hooks to manage state and fetch data asynchronously.
+
+**Files to Create/Modify:**
+
+- `plugins/calendar/src/index.tsx`
+- `plugins/calendar/src/components/CalendarGrid.tsx`
+- `plugins/calendar/src/hooks/useEvents.ts`
+- `plugins/calendar/tests/calendar.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Successfully queries and aggregates tasks and goals from other plugins via the Data Broker.
+- [ ] Renders a responsive monthly/weekly calendar grid using Tailwind CSS and shadcn/ui.
+- [ ] Correctly handles empty states and loading states when fetching data.
+
+**Testing Requirements:**
+
+Write component tests using React Testing Library and Jest/Vitest. Mock the Data Broker API to return sample tasks and goals, and verify they render in the correct calendar slots.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-001` (TSK-001). This task's output must be compatible with those modules before proceeding.
+
+#### `TSK-006`: Kanban / Project Board Plugin — depends on TSK-001
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 14.0 |
+| Complexity | 1.6 |
+| Risk | 1.2 |
+| Weight | 26.88 |
+| Module | `plugins/kanban/src/index.tsx` |
+| Dependencies | `TSK-001` |
+
+**Objective:**
+
+Build a visual Kanban board that shares the todo namespace.
+
+**Technical Approach:**
+
+Implement drag-and-drop columns (Todo, In Progress, Done) using @hello-pangea/dnd. Read and write tasks directly to the shared todo namespace via the Data Broker. Ensure state updates are debounced to prevent database write bottlenecks.
+
+**Files to Create/Modify:**
+
+- `plugins/kanban/src/index.tsx`
+- `plugins/kanban/src/components/Board.tsx`
+- `plugins/kanban/src/components/Column.tsx`
+- `plugins/kanban/tests/kanban.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Renders columns for Todo, In Progress, and Done.
+- [ ] Allows dragging and dropping tasks between columns, updating the state in the shared todo namespace.
+- [ ] Persists task order and column state across reloads.
+
+**Testing Requirements:**
+
+Write integration tests simulating drag-and-drop interactions. Verify that the underlying Data Broker write commands are triggered with the correct parameters.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-001` (TSK-001). This task's output must be compatible with those modules before proceeding.
+
+#### `TSK-008`: Linked Notes / Knowledge Graph Plugin — depends on TSK-004
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 18.0 |
+| Complexity | 2.2 |
+| Risk | 1.5 |
+| Weight | 59.40 |
+| Module | `plugins/notes/src/index.tsx` |
+| Dependencies | `TSK-004` |
+
+**Objective:**
+
+Build an Obsidian-style markdown note-taking tool with backlinking and an animated SVG knowledge graph view.
+
+**Technical Approach:**
+
+Implement markdown parsing and backlink indexing. Render the knowledge graph using a force-directed layout in SVG/D3. Ensure the plugin triggers the biometric challenge on load and the relock command on unmount.
+
+**Files to Create/Modify:**
+
+- `plugins/notes/src/index.tsx`
+- `plugins/notes/src/components/GraphView.tsx`
+- `plugins/notes/src/components/Editor.tsx`
+- `plugins/notes/tests/notes.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Triggers biometric challenge on load and locks partition on unmount.
+- [ ] Parses markdown and correctly indexes backlinks between notes.
+- [ ] Renders an interactive, animated SVG knowledge graph representing note connections.
+
+**Testing Requirements:**
+
+Write unit tests for markdown parsing and backlink extraction. Mock the biometric challenge and verify that notes are only rendered after successful authentication.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-004` (TSK-004). This task's output must be compatible with those modules before proceeding.
+
+#### `TSK-009`: Password / Secrets Vault Plugin — depends on TSK-004
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 10.0 |
+| Complexity | 1.8 |
+| Risk | 1.6 |
+| Weight | 28.80 |
+| Module | `plugins/vault/src/index.tsx` |
+| Dependencies | `TSK-004` |
+
+**Objective:**
+
+Build a secure credential and secrets manager.
+
+**Technical Approach:**
+
+Implement secure password generation, category filtering, and search. Enforce strict clipboard write-only permissions via the Data Broker. Ensure biometric challenge on load and immediate relock on unmount.
+
+**Files to Create/Modify:**
+
+- `plugins/vault/src/index.tsx`
+- `plugins/vault/src/components/VaultList.tsx`
+- `plugins/vault/tests/vault.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Triggers biometric challenge on load and locks partition on unmount.
+- [ ] Generates secure passwords with customizable length and character sets.
+- [ ] Enforces strict clipboard write-only permissions via the Data Broker.
+
+**Testing Requirements:**
+
+Write unit tests for the password generator. Mock the clipboard API and verify that passwords can be copied to the clipboard but not read back by the plugin.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-004` (TSK-004). This task's output must be compatible with those modules before proceeding.
+
+#### `TSK-010`: Budget / Expense Tracker Plugin — depends on TSK-001
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 12.0 |
+| Complexity | 1.5 |
+| Risk | 1.2 |
+| Weight | 21.60 |
+| Module | `plugins/budget/src/index.tsx` |
+| Dependencies | `TSK-001` |
+
+**Objective:**
+
+Build a personal finance tracker that links spending limits to savings goals.
+
+**Technical Approach:**
+
+Implement expense logging and category budgeting. Query the Goals Tracker plugin via the Data Broker to display progress toward linked savings goals.
+
+**Files to Create/Modify:**
+
+- `plugins/budget/src/index.tsx`
+- `plugins/budget/src/components/BudgetSummary.tsx`
+- `plugins/budget/tests/budget.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Allows logging expenses and setting category budgets.
+- [ ] Queries the Goals Tracker plugin via the Data Broker to display progress toward linked savings goals.
+- [ ] Renders visual progress bars for budget limits.
+
+**Testing Requirements:**
+
+Write unit tests for budget calculation logic. Mock the Goals Tracker API response and verify that savings goals are correctly integrated into the UI.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-001` (TSK-001). This task's output must be compatible with those modules before proceeding.
+
+#### `TSK-013`: Clipboard Manager / Snippet Vault Plugin — depends on TSK-003
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 9.0 |
+| Complexity | 1.6 |
+| Risk | 1.3 |
+| Weight | 18.72 |
+| Module | `plugins/clipboard/src/index.tsx` |
+| Dependencies | `TSK-003` |
+
+**Objective:**
+
+Build a clipboard history tracker and text snippet manager.
+
+**Technical Approach:**
+
+Subscribe to the host's clipboard stream. Display a persistent, non-intrusive notice to the user that clipboard monitoring is active. Store history securely in SQLCipher.
+
+**Files to Create/Modify:**
+
+- `plugins/clipboard/src/index.tsx`
+- `plugins/clipboard/src/components/HistoryList.tsx`
+- `plugins/clipboard/tests/clipboard_plugin.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Subscribes to the host's clipboard stream and displays history.
+- [ ] Displays a persistent, non-intrusive notice to the user that clipboard monitoring is active.
+- [ ] Stores history securely in SQLCipher.
+
+**Testing Requirements:**
+
+Write integration tests to verify that incoming clipboard stream events are appended to the history list. Ensure the active monitoring notice is visible when subscribed.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-003` (TSK-003). This task's output must be compatible with those modules before proceeding.
+
+#### `TSK-014`: Read-It-Later / RSS Reader Plugin — depends on TSK-002
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 10.0 |
+| Complexity | 1.4 |
+| Risk | 1.8 |
+| Weight | 25.20 |
+| Module | `plugins/rss/src/index.tsx` |
+| Dependencies | `TSK-002` |
+
+**Objective:**
+
+Build an offline-first RSS feed aggregator and article reader.
+
+**Technical Approach:**
+
+Read pre-fetched feed data from the local SQLCipher partition. Render articles in a clean, distraction-free reader view. No outbound network requests are made by the plugin.
+
+**Files to Create/Modify:**
+
+- `plugins/rss/src/index.tsx`
+- `plugins/rss/src/components/FeedList.tsx`
+- `plugins/rss/tests/rss_plugin.test.tsx`
+
+**Acceptance Criteria:**
+
+- [ ] Reads pre-fetched feed data from the local SQLCipher partition.
+- [ ] Renders articles in a clean, distraction-free reader view.
+- [ ] Ensures no outbound network requests are made by the plugin iframe.
+
+**Testing Requirements:**
+
+Write component tests to verify that feed items are correctly loaded from the database and rendered. Verify that clicking an article opens the reader view.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-002` (TSK-002). This task's output must be compatible with those modules before proceeding.
+
+> **GATE 2 — Validation**
+>
+> | Check | Tool | Pass Criteria |
+> | ----- | ---- | -------------- |
+> | JS Linting | `eslint ui/**/*.js` | Zero errors |
+> | JS Formatting | `prettier --check ui/**/*.js` | No unformatted files |
+> | CSS Linting | `stylelint ui/**/*.css` | Zero warnings |
+> | Unit Tests | `pytest tests/` | 100% pass rate |
+> | Dependency Audit | `pip-audit` | No known vulnerabilities |
+>
+> **Status:** ⬜ PENDING
+
+### Phase 3: Testing (TSK-015)
+
+**Tasks:** TSK-015
+
+#### `TSK-015`: Integration Smoke Testing & Verification — depends on TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012, TSK-013, TSK-014
+
+| Attribute | Value |
+| --------- | ----- |
+| Estimated Hours | 12.0 |
+| Complexity | 1.5 |
+| Risk | 1.3 |
+| Weight | 23.40 |
+| Module | `tests/integration_smoke.test.ts` |
+| Dependencies | `TSK-005`, `TSK-006`, `TSK-007`, `TSK-008`, `TSK-009`, `TSK-010`, `TSK-011`, `TSK-012`, `TSK-013`, `TSK-014` |
+
+**Objective:**
+
+Conduct comprehensive integration testing, security audits, and performance verification of the entire expanded plugin catalog.
+
+**Technical Approach:**
+
+Verify that all 10 plugins load correctly within their sandboxed iframes. Audit CSP headers to ensure connect-src 'none' is strictly enforced and no external network leaks occur. Verify that the independent biometric gates successfully prompt and immediately relock/zeroize keys on plugin navigation. Verify that the host-side JSON Schema validation correctly blocks malformed cross-plugin queries. Verify that clipboard streaming and RSS background fetching operate within performance budgets without blocking the main thread.
+
+**Files to Create/Modify:**
+
+- `tests/integration_smoke.test.ts`
+- `tests/security_audit.test.ts`
+- `tests/performance.test.ts`
+
+**Acceptance Criteria:**
+
+- [ ] All 10 plugins load, render, and function correctly within their sandboxed iframes.
+- [ ] Security audit confirms zero plaintext leaks and strict sandbox isolation.
+- [ ] Performance benchmarks confirm zero main-thread blocking during background operations.
+
+**Testing Requirements:**
+
+Write Playwright/Cypress end-to-end tests to automate loading each plugin, triggering biometric prompts, navigating away to verify relocking, and checking CSP violations in the console.
+
+**Integration Notes:**
+
+Depends on completion of `TSK-005` (TSK-005), `TSK-006` (TSK-006), `TSK-007` (TSK-007), `TSK-008` (TSK-008), `TSK-009` (TSK-009), `TSK-010` (TSK-010), `TSK-011` (TSK-011), `TSK-012` (TSK-012), `TSK-013` (TSK-013), `TSK-014` (TSK-014). This task's output must be compatible with those modules before proceeding.
+
+> **GATE 3 — Validation**
+>
+> | Check | Tool | Pass Criteria |
+> | ----- | ---- | -------------- |
+> | JS Linting | `eslint ui/**/*.js` | Zero errors |
+> | JS Formatting | `prettier --check ui/**/*.js` | No unformatted files |
+> | CSS Linting | `stylelint ui/**/*.css` | Zero warnings |
+> | Unit Tests | `pytest tests/` | 100% pass rate |
+> | Dependency Audit | `pip-audit` | No known vulnerabilities |
+>
+> **Status:** ⬜ PENDING
+
+## 4. Technical Components
+
+- **Backend:** Requests.
+- **Frontend:** TypeScript, React, Tailwind CSS, Mermaid.js.
+- **Infrastructure:** Vite, Tauri.
+- **Tooling:** ESLint.
+
+## 5. Deliverables
+
+- `TSK-001`: Data Broker API Extension (JSON Schema Validation)
+- `TSK-002`: Host-Mediated RSS Background Fetch Service
+- `TSK-003`: Host-Active Clipboard Streaming Service
+- `TSK-004`: Independent Biometric Challenge & Auto-Relock
+- `TSK-005`: Calendar / Scheduler Plugin
+- `TSK-006`: Kanban / Project Board Plugin
+- `TSK-007`: Pomodoro / Focus Timer Plugin
+- `TSK-008`: Linked Notes / Knowledge Graph Plugin
+- `TSK-009`: Password / Secrets Vault Plugin
+- `TSK-010`: Budget / Expense Tracker Plugin
+- `TSK-011`: Mood / Wellness Tracker Plugin
+- `TSK-012`: Contacts / Mini-CRM Plugin
+- `TSK-013`: Clipboard Manager / Snippet Vault Plugin
+- `TSK-014`: Read-It-Later / RSS Reader Plugin
+- `TSK-015`: Integration Smoke Testing & Verification

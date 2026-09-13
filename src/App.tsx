@@ -36,7 +36,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     version: "1.0.0",
     icon: "🎯",
     ui: { activityBar: true, sidebarSection: "Goals" },
-    permissions: ["db:read"],
+    permissions: ["db:read", "db:write"],
     sandboxed: true,
   },
   {

@@ -34,7 +34,13 @@ Each task must be marked as `[ ]` (Todo), `[/]` (In Progress), or `[x]` (Complet
   - Two-pane layout: TodoList sidebar + TodoEditor main area
   - Registered in `src/App.tsx` `MOCK_PLUGINS` with `activityBar: true`
   - Activity bar, sidebar nav, and `switch-todo` command already wired in host shell
-- [ ] TSK-015 (Est: 14h) — Goals Tracker Plugin (Cross-Plugin Data Sharing)
+- [x] TSK-015 (Est: 14h) — Goals Tracker Plugin (Cross-Plugin Data Sharing)
+  - Created `plugins/goals/` with React + Vite scaffold
+  - Implements CRUD against `goals` table (title, description, status, target_date)
+  - Two-pane layout: GoalList sidebar + GoalEditor main area
+  - Registered in `src/App.tsx` `MOCK_PLUGINS` with `activityBar: true` and `db:read`/`db:write` permissions
+  - Activity bar, sidebar nav, and `switch-goals` command wired in host shell
+  - Cross-plugin data sharing: GoalEditor queries `todos` table to display related tasks matching goal title
 
 ### 🟡 Operations
 

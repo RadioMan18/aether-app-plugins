@@ -214,3 +214,24 @@
 - Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors, Vite build succeeds (2004 modules)
 - All source files under 400 lines (largest: PluginStore.tsx at 183 lines)
 
+## TSK-012 Completed: Core Plugin SDK & React Template
+
+**Timestamp**: 2026-09-13T12:15:00Z
+**Action**: Completed Core Plugin SDK & React Template task. Created TypeScript SDK with postMessage bridge and React template for plugin development.
+**Details**:
+- Created `plugins/sdk/package.json` with SDK package configuration
+- Created `plugins/sdk/tsconfig.json` with TypeScript config for library build
+- Created `plugins/sdk/src/types.ts` with TypeScript interfaces for plugin communication
+- Created `plugins/sdk/src/bridge.ts` with postMessage bridge implementation using correlation IDs
+- Created `plugins/sdk/src/index.ts` with `db.query`, `db.execute`, and `broker.request` APIs
+- Created `plugins/template/package.json` with React + TypeScript + Vite dependencies
+- Created `plugins/template/tsconfig.json` with strict TypeScript settings
+- Created `plugins/template/vite.config.ts` for plugin dev server on port 1421
+- Created `plugins/template/index.html` entry point
+- Created `plugins/template/src/main.tsx` React entry point
+- Created `plugins/template/src/App.tsx` demonstrating SDK usage with database query
+- SDK uses `window.parent.postMessage` for IPC communication
+- SDK provides promise-based API with correlation ID matching
+- Frontend checks: TypeScript typecheck passes, ESLint passes with 0 errors
+- All source files under 400 lines (largest: PluginStore.tsx at 183 lines)
+

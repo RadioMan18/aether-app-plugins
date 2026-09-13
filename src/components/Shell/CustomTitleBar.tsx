@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Minus, Square, X } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export function CustomTitleBar() {
   const [isMaximized, setIsMaximized] = useState(false);
-  const windowRef = getCurrentWindow();
+  const windowRef = useMemo(() => getCurrentWindow(), []);
 
   useEffect(() => {
     let unlisten: (() => void) | undefined;
@@ -44,7 +44,11 @@ export function CustomTitleBar() {
   };
 
   const handleClose = async () => {
-    await windowRef.close();
+    try {
+      await windowRef.close();
+    } catch (error) {
+      console.error("Failed to close window:", error);
+    }
   };
 
   return (

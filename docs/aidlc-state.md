@@ -28,7 +28,12 @@ Each task must be marked as `[ ]` (Todo), `[/]` (In Progress), or `[x]` (Complet
 - [x] TSK-011 (Est: 12h) — Plugin Installer & Manager
 - [x] TSK-012 (Est: 10h) — Core Plugin SDK & React Template
 - [x] TSK-013 (Est: 16h) — Journaling Plugin (Encrypted, Native-Feel UI)
-- [ ] TSK-014 (Est: 10h) — Todo List Plugin (with Activity Bar Integration)
+- [x] TSK-014 (Est: 10h) — Todo List Plugin (with Activity Bar Integration)
+  - Created `plugins/todo/` with React + Vite scaffold
+  - Implements CRUD against `todos` table (title, completed, priority, due_date)
+  - Two-pane layout: TodoList sidebar + TodoEditor main area
+  - Registered in `src/App.tsx` `MOCK_PLUGINS` with `activityBar: true`
+  - Activity bar, sidebar nav, and `switch-todo` command already wired in host shell
 - [ ] TSK-015 (Est: 14h) — Goals Tracker Plugin (Cross-Plugin Data Sharing)
 
 ### 🟡 Operations

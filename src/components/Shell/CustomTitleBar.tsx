@@ -4,9 +4,17 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export function CustomTitleBar() {
   const [isMaximized, setIsMaximized] = useState(false);
-  const windowRef = useMemo(() => getCurrentWindow(), []);
+  const windowRef = useMemo(() => {
+    try {
+      return getCurrentWindow();
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
+    if (!windowRef) return;
+
     let unlisten: (() => void) | undefined;
 
     const setup = async () => {
@@ -32,10 +40,12 @@ export function CustomTitleBar() {
   }, [windowRef]);
 
   const handleMinimize = async () => {
+    if (!windowRef) return;
     await windowRef.minimize();
   };
 
   const handleMaximize = async () => {
+    if (!windowRef) return;
     if (isMaximized) {
       await windowRef.unmaximize();
     } else {
@@ -44,6 +54,7 @@ export function CustomTitleBar() {
   };
 
   const handleClose = async () => {
+    if (!windowRef) return;
     try {
       await windowRef.close();
     } catch (error) {

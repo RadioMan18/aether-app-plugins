@@ -55,6 +55,7 @@ function App() {
   useEffect(() => {
     const seed = async () => {
       try {
+        await invoke("ensure_database");
         await invoke("seed_builtin_plugins");
       } catch {
         // Ignore seed errors during early startup
@@ -86,6 +87,7 @@ function App() {
           isOpen={shell.sidebarOpen}
           isCompact={shell.isCompact}
           onToggle={shell.toggleSidebar}
+          onPluginSelect={shell.setActivePluginId}
           activePluginId={shell.activePluginId}
           plugins={MOCK_PLUGINS}
         />
@@ -94,8 +96,8 @@ function App() {
         ) : (
           <MainContent activePlugin={activePlugin} />
         )}
-        <StatusBar shell={shell} />
       </div>
+      <StatusBar shell={shell} />
       <CommandPalette
         activePluginId={shell.activePluginId}
         sidebarOpen={shell.sidebarOpen}

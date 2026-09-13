@@ -32,7 +32,7 @@ requestAnimationFrame(() => {
   requestAnimationFrame(() => {
     window.parent.postMessage({
       type: "aether:plugin-mounted",
-      plugin: "journal",
+      plugin: "todo",
       details: {
         root: root.getBoundingClientRect().toJSON(),
         body: document.body.getBoundingClientRect().toJSON(),

@@ -2,6 +2,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PluginSandbox } from "@/components/PluginSandbox";
 import type { PluginManifest } from "@/types/plugin";
 
+function pluginUrl(pluginId: string) {
+  const protocol = navigator.userAgent.includes("Windows") ? "http://plugin.localhost" : "plugin://localhost";
+  return `${protocol}/${pluginId}/index.html`;
+}
+
 interface MainContentProps {
   activePlugin: PluginManifest | null;
 }
@@ -17,7 +22,7 @@ const MotionDiv = motion.div as React.ComponentType<
 
 export function MainContent({ activePlugin }: MainContentProps) {
   return (
-    <main className="flex-1 overflow-y-auto scrollbar-thin bg-canvas">
+    <main className="min-h-0 min-w-0 flex-1 overflow-y-auto scrollbar-thin bg-canvas">
       <AnimatePresence mode="wait">
         {activePlugin ? (
           <MotionDiv
@@ -26,7 +31,7 @@ export function MainContent({ activePlugin }: MainContentProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="flex h-full flex-col"
+            className="flex h-full w-full flex-col"
           >
             <div className="flex items-center gap-3 border-b border-border px-6 py-4">
               <span className="text-2xl" role="img" aria-label={activePlugin.name}>
@@ -37,11 +42,11 @@ export function MainContent({ activePlugin }: MainContentProps) {
                 <p className="text-sm text-text-secondary">v{activePlugin.version}</p>
               </div>
             </div>
-            <div className="flex-1 p-6">
+            <div className="min-h-0 min-w-0 flex-1 p-6">
               {activePlugin.sandboxed ? (
-                <div className="h-full overflow-hidden rounded-lg border border-border">
+                <div className="h-full min-h-[480px] w-full overflow-hidden rounded-lg border border-border">
                   <PluginSandbox
-                    src={`plugin://localhost/${activePlugin.id}/index.html`}
+                    src={pluginUrl(activePlugin.id)}
                     title={activePlugin.name}
                     plugin={activePlugin}
                   />

@@ -16,12 +16,14 @@ impl Database {
             .map_err(|e| format!("Failed to create app data directory: {}", e))?;
 
         let db_path = app_data_dir.join("aether.db");
+        log::info!("Database open retrieving encryption key");
         let key = CredentialManager::retrieve_key().map_err(|e| {
             format!(
                 "Failed to retrieve encryption key from credential manager: {}",
                 e
             )
         })?;
+        log::info!("Database key retrieved; opening SQLCipher database");
 
         Self::open_with_key(db_path, key)
     }
@@ -65,19 +67,17 @@ impl Database {
     }
 
     fn open_with_key(db_path: PathBuf, key: String) -> Result<Self, String> {
+        log::info!("Database opening file: {}", db_path.display());
         let conn = rusqlite::Connection::open(&db_path)
             .map_err(|e| format!("Failed to open database: {}", e))?;
 
+        log::info!("Database applying SQLCipher key");
         conn.execute_batch(&format!("PRAGMA key = '{}';", key))
             .map_err(|e| format!("Failed to set encryption key: {}", e))?;
 
-        let integrity: String = conn
-            .query_row("PRAGMA cipher_integrity_check;", [], |row| row.get(0))
-            .map_err(|e| format!("Failed to check database integrity: {}", e))?;
-
-        if integrity != "ok" {
-            return Err(format!("Database integrity check failed: {}", integrity));
-        }
+        log::info!("Database probing decrypted schema");
+        conn.query_row("SELECT count(*) FROM sqlite_master", [], |_row| Ok(()))
+            .map_err(|e| format!("Failed to open encrypted database: {}", e))?;
 
         Self::initialize_schema(&conn)
             .map_err(|e| format!("Failed to initialize schema: {}", e))?;

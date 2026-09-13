@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import type { JournalEntry } from "../App";
+import type { JournalEntry } from "./App";
 
 interface EditorProps {
   entry: JournalEntry;
-  onSave: (updates: Partial<JournalEntry>) => void;
+  onSave: (updates: Partial<JournalEntry>) => Promise<void>;
 }
 
 export function Editor({ entry, onSave }: EditorProps) {
@@ -71,6 +71,23 @@ export function Editor({ entry, onSave }: EditorProps) {
         >
           Last updated: {new Date(entry.updated_at).toLocaleString()}
           {isSaving && <span style={{ marginLeft: 12, color: "#55b3ff" }}>Saving...</span>}
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+            style={{
+              marginLeft: 12,
+              background: "#55b3ff",
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              padding: "6px 12px",
+              cursor: isSaving ? "default" : "pointer",
+              opacity: isSaving ? 0.6 : 1,
+            }}
+          >
+            Save
+          </button>
         </div>
       </div>
 

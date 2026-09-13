@@ -45,6 +45,22 @@ pub fn initialize_database(app: AppHandle) -> Result<DatabaseInfo, String> {
 }
 
 #[tauri::command]
+pub fn ensure_database(app: AppHandle) -> Result<DatabaseInfo, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db_path = app_data_dir.join("aether.db");
+    let db = if db_path.exists() {
+        Database::open(app_data_dir).map_err(|e| e.to_string())?
+    } else {
+        Database::initialize_new(app_data_dir).map_err(|e| e.to_string())?
+    };
+
+    Ok(DatabaseInfo {
+        path: db.db_path().to_string_lossy().to_string(),
+        initialized: true,
+    })
+}
+
+#[tauri::command]
 pub async fn unlock_database(app: AppHandle) -> Result<DatabaseInfo, String> {
     let app_data_dir = get_app_data_dir(&app)?;
     let db_path = app_data_dir.join("aether.db");
@@ -110,11 +126,28 @@ pub fn register_plugin(
 
 #[tauri::command]
 pub fn plugin_ipc(app: AppHandle, request: PluginRequest) -> Result<PluginResponse, String> {
+    log::info!(
+        "Plugin IPC request: plugin={}, type={}, id={}",
+        request.plugin_id,
+        request.request_type,
+        request.id
+    );
     let app_data_dir = get_app_data_dir(&app)?;
+    log::info!("Plugin IPC opening database: {}", app_data_dir.display());
     let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    log::info!("Plugin IPC database opened: plugin={}", request.plugin_id);
     let broker = PluginBroker::new(&db);
     let plugin_id = request.plugin_id.clone();
-    broker.handle(&plugin_id, request)
+    log::info!("Plugin IPC handling request: plugin={}, type={}", plugin_id, request.request_type);
+    let response = broker.handle(&plugin_id, request)?;
+    log::info!(
+        "Plugin IPC response: plugin={}, id={}, success={}, error={:?}",
+        plugin_id,
+        response.id,
+        response.success,
+        response.error
+    );
+    Ok(response)
 }
 
 #[tauri::command]

@@ -26,6 +26,7 @@ pub fn run() {
             commands::greet,
             commands::get_app_version,
             commands::initialize_database,
+            commands::ensure_database,
             commands::unlock_database,
             commands::get_database_info,
             commands::invoke_biometric_challenge,

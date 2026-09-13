@@ -31,7 +31,9 @@ impl<'a> PluginBroker<'a> {
         plugin_id: &str,
         request: PluginRequest,
     ) -> Result<PluginResponse, String> {
+        log::info!("Plugin broker loading permissions: plugin={}", plugin_id);
         let permissions = self.db.get_plugin_permissions(plugin_id)?;
+        log::info!("Plugin broker permissions loaded: plugin={}", plugin_id);
         let required = required_permission(&request.request_type);
 
         if !permissions.contains(&required.to_string()) {
@@ -44,8 +46,14 @@ impl<'a> PluginBroker<'a> {
         }
 
         match request.request_type.as_str() {
-            "db:query" => self.handle_db_query(request),
-            "db:execute" => self.handle_db_execute(request, &permissions),
+            "db:query" => {
+                log::info!("Plugin broker executing query: plugin={}", plugin_id);
+                self.handle_db_query(request)
+            }
+            "db:execute" => {
+                log::info!("Plugin broker executing statement: plugin={}", plugin_id);
+                self.handle_db_execute(request, &permissions)
+            }
             _ => Err(format!("Unknown request type: {}", request.request_type)),
         }
     }
@@ -94,6 +102,7 @@ impl<'a> PluginBroker<'a> {
                 "rows".to_string(),
                 Value::Array(rows.into_iter().map(Value::Array).collect()),
             );
+            log::info!("Plugin query result: columns={}, rows={}", column_count, data["rows"].as_array().map_or(0, Vec::len));
 
             Ok(PluginResponse {
                 id: request.id,
@@ -137,6 +146,7 @@ impl<'a> PluginBroker<'a> {
 
             let mut data = serde_json::Map::new();
             data.insert("changes".to_string(), Value::Number(changes.into()));
+            log::info!("Plugin execute result: changes={}", changes);
 
             Ok(PluginResponse {
                 id: request.id,

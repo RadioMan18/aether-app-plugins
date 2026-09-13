@@ -1,36 +1,38 @@
 import { useEffect, useState, useRef } from "react";
-import { EntryList } from "./components/EntryList";
-import { Editor } from "./Editor";
+import { TodoList } from "./TodoList";
+import { TodoEditor } from "./TodoEditor";
 
-export interface JournalEntry {
+export interface Todo {
   id: string;
   title: string;
-  content: string;
+  completed: boolean;
+  priority: number;
+  due_date: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export function App() {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [activeTodoId, setActiveTodoId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const loadedRef = useRef(false);
 
-  const activeEntry = entries.find((e) => e.id === activeEntryId) ?? null;
+  const activeTodo = todos.find((t) => t.id === activeTodoId) ?? null;
 
   useEffect(() => {
-    const loadEntries = async () => {
+    const loadTodos = async () => {
       try {
         setError(null);
         const { db } = await import("../../sdk/src/index.ts");
-        const rows = await db.query<JournalEntry>(
-          "SELECT id, title, content, created_at, updated_at FROM journal_entries ORDER BY updated_at DESC"
+        const rows = await db.query<Todo>(
+          "SELECT id, title, completed, priority, due_date, created_at, updated_at FROM todos ORDER BY updated_at DESC"
         );
-        setEntries(rows);
+        setTodos(rows);
         if (rows.length > 0 && !loadedRef.current) {
           loadedRef.current = true;
-          setActiveEntryId(rows[0].id);
+          setActiveTodoId(rows[0].id);
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
@@ -39,67 +41,68 @@ export function App() {
       }
     };
 
-    loadEntries();
+    loadTodos();
   }, []);
 
-  const handleCreateEntry = async () => {
+  const handleCreateTodo = async () => {
     try {
       setError(null);
       const { db } = await import("../../sdk/src/index.ts");
       const id = crypto.randomUUID();
       const now = new Date().toISOString();
       await db.execute(
-        "INSERT INTO journal_entries (id, title, content, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5)",
-        [id, "Untitled Entry", "", now, now]
+        "INSERT INTO todos (id, title, completed, priority, due_date, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+        [id, "New Task", false, 0, null, now, now]
       );
 
-      const rows = await db.query<JournalEntry>(
-        "SELECT id, title, content, created_at, updated_at FROM journal_entries ORDER BY updated_at DESC LIMIT 1"
+      const rows = await db.query<Todo>(
+        "SELECT id, title, completed, priority, due_date, created_at, updated_at FROM todos ORDER BY updated_at DESC LIMIT 1"
       );
       if (rows.length > 0) {
-        setEntries((prev) => [rows[0], ...prev]);
-        setActiveEntryId(rows[0].id);
+        setTodos((prev) => [rows[0], ...prev]);
+        setActiveTodoId(rows[0].id);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
   };
 
-  const handleUpdateEntry = async (id: string, updates: Partial<JournalEntry>) => {
+  const handleUpdateTodo = async (id: string, updates: Partial<Todo>) => {
     try {
       setError(null);
       const { db } = await import("../../sdk/src/index.ts");
       const now = new Date().toISOString();
-      
-      if (updates.title !== undefined || updates.content !== undefined) {
-        const entry = entries.find((e) => e.id === id);
-        const title = updates.title ?? entry?.title ?? "Untitled Entry";
-        const content = updates.content ?? entry?.content ?? "";
-        
-        await db.execute(
-          "UPDATE journal_entries SET title = ?1, content = ?2, updated_at = ?3 WHERE id = ?4",
-          [title, content, now, id]
-        );
+      const todo = todos.find((t) => t.id === id);
+      if (!todo) return;
 
-        setEntries((prev) =>
-          prev.map((e) =>
-            e.id === id ? { ...e, ...updates, updated_at: now } : e
-          )
-        );
-      }
+      const title = updates.title ?? todo.title;
+      const completed = updates.completed ?? todo.completed;
+      const priority = updates.priority ?? todo.priority;
+      const due_date = updates.due_date ?? todo.due_date;
+
+      await db.execute(
+        "UPDATE todos SET title = ?1, completed = ?2, priority = ?3, due_date = ?4, updated_at = ?5 WHERE id = ?6",
+        [title, completed ? 1 : 0, priority, due_date, now, id]
+      );
+
+      setTodos((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, ...updates, updated_at: now } : t
+        )
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
   };
 
-  const handleDeleteEntry = async (id: string) => {
+  const handleDeleteTodo = async (id: string) => {
     try {
       setError(null);
       const { db } = await import("../../sdk/src/index.ts");
-      await db.execute("DELETE FROM journal_entries WHERE id = ?1", [id]);
-      setEntries((prev) => prev.filter((e) => e.id !== id));
-      if (activeEntryId === id) {
-        setActiveEntryId(entries.find((e) => e.id !== id)?.id ?? null);
+      await db.execute("DELETE FROM todos WHERE id = ?1", [id]);
+      setTodos((prev) => prev.filter((t) => t.id !== id));
+      if (activeTodoId === id) {
+        setActiveTodoId(todos.find((t) => t.id !== id)?.id ?? null);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -155,10 +158,10 @@ export function App() {
               color: "#f0f0f0",
             }}
           >
-            Journal
+            Todo List
           </h1>
           <button
-            onClick={handleCreateEntry}
+            onClick={handleCreateTodo}
             style={{
               background: "#55b3ff",
               color: "#fff",
@@ -170,7 +173,7 @@ export function App() {
               fontWeight: 500,
             }}
           >
-            New Entry
+            New Task
           </button>
         </div>
 
@@ -183,24 +186,25 @@ export function App() {
               textAlign: "center",
             }}
           >
-            Loading entries...
+            Loading tasks...
           </div>
         ) : (
-          <EntryList
-            entries={entries}
-            activeEntryId={activeEntryId}
-            onSelect={setActiveEntryId}
-            onDelete={handleDeleteEntry}
+          <TodoList
+            todos={todos}
+            activeTodoId={activeTodoId}
+            onSelect={setActiveTodoId}
+            onDelete={handleDeleteTodo}
+            onToggleComplete={handleUpdateTodo}
           />
         )}
       </div>
 
       <div style={{ flex: 1, overflow: "hidden" }}>
-        {activeEntry ? (
-          <Editor
-            key={activeEntry.id}
-            entry={activeEntry}
-            onSave={(updates) => handleUpdateEntry(activeEntry.id, updates)}
+        {activeTodo ? (
+          <TodoEditor
+            key={activeTodo.id}
+            todo={activeTodo}
+            onSave={(updates) => handleUpdateTodo(activeTodo.id, updates)}
           />
         ) : (
           <div
@@ -213,7 +217,7 @@ export function App() {
               fontSize: 14,
             }}
           >
-            Select an entry or create a new one
+            Select a task or create a new one
           </div>
         )}
       </div>

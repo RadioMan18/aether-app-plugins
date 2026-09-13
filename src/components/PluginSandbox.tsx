@@ -15,9 +15,22 @@ export function PluginSandbox({ src, title, plugin }: PluginSandboxProps) {
     const iframe = iframeRef.current;
     if (!iframe) return;
 
+    const handleLoad = () => console.info(`[PluginSandbox] loaded ${src}`);
+    const handleError = () => console.error(`[PluginSandbox] failed to load ${src}`);
+    iframe.addEventListener("load", handleLoad);
+    iframe.addEventListener("error", handleError);
+
     const handleMessage = async (event: MessageEvent) => {
       const message = event.data;
       if (!message || typeof message !== "object") return;
+      if (message.type === "aether:plugin-mounted") {
+        console.info(`[PluginSandbox:${plugin.id}] React root mounted`, message.details);
+        return;
+      }
+      if (message.type === "aether:plugin-error") {
+        console.error(`[PluginSandbox:${plugin.id}]`, message.error);
+        return;
+      }
       if (message.type !== "aether:request") return;
 
       const { requestId, payload } = message;
@@ -54,16 +67,20 @@ export function PluginSandbox({ src, title, plugin }: PluginSandboxProps) {
     };
 
     window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [plugin.id]);
+    return () => {
+      iframe.removeEventListener("load", handleLoad);
+      iframe.removeEventListener("error", handleError);
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [plugin.id, src]);
 
   return (
     <iframe
       ref={iframeRef}
       src={src}
       title={title}
-      sandbox="allow-scripts"
-      className="h-full w-full border-0 bg-canvas"
+      sandbox="allow-scripts allow-same-origin allow-top-navigation-to-custom-protocols"
+      className="block h-full min-h-[480px] min-w-full w-full border-0 bg-canvas"
       allow="clipboard-write"
     />
   );

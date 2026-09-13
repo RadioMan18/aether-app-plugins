@@ -61,6 +61,7 @@ export function sendRequest<T>(payload: AetherRequestPayload, timeout = DEFAULT_
   const timer = setTimeout(() => {
     if (pendingRequests.has(id)) {
       pendingRequests.delete(id);
+      console.error(`[PluginSDK] request timed out: ${payload.type} (${id})`);
     }
   }, timeout);
 

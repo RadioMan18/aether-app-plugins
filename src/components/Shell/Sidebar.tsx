@@ -8,11 +8,12 @@ interface SidebarProps {
   isOpen: boolean;
   isCompact: boolean;
   onToggle: () => void;
+  onPluginSelect: (pluginId: string) => void;
   activePluginId: string | null;
   plugins: PluginManifest[];
 }
 
-export function Sidebar({ isOpen, isCompact, onToggle, activePluginId, plugins }: SidebarProps) {
+export function Sidebar({ isOpen, isCompact, onToggle, onPluginSelect, activePluginId, plugins }: SidebarProps) {
   const sidebarContent = useMemo(() => {
     const activePlugin = plugins.find((p) => p.id === activePluginId);
     const sectionTitle = activePlugin?.ui?.sidebarSection ?? "Navigation";
@@ -36,9 +37,9 @@ export function Sidebar({ isOpen, isCompact, onToggle, activePluginId, plugins }
               Favorites
             </h3>
             <nav className="space-y-0.5">
-              <SidebarItem label="Journal" icon="📓" />
-              <SidebarItem label="Todo List" icon="✅" />
-              <SidebarItem label="Goals" icon="🎯" />
+              <SidebarItem label="Journal" icon="📓" onClick={() => onPluginSelect("journal")} />
+              <SidebarItem label="Todo List" icon="✅" onClick={() => onPluginSelect("todo")} />
+              <SidebarItem label="Goals" icon="🎯" onClick={() => onPluginSelect("goals")} />
             </nav>
           </div>
 
@@ -54,7 +55,7 @@ export function Sidebar({ isOpen, isCompact, onToggle, activePluginId, plugins }
         </div>
       </>
     );
-  }, [activePluginId, onToggle, plugins]);
+  }, [activePluginId, onPluginSelect, onToggle, plugins]);
 
   const MotionAside = motion.aside as React.ComponentType<
     React.HTMLAttributes<HTMLElement> & {
@@ -91,9 +92,13 @@ export function Sidebar({ isOpen, isCompact, onToggle, activePluginId, plugins }
   );
 }
 
-function SidebarItem({ label, icon }: { label: string; icon: string }) {
+function SidebarItem({ label, icon, onClick }: { label: string; icon: string; onClick?: () => void }) {
   return (
-    <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:bg-surface-2 hover:text-text-primary">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-text-secondary transition-colors duration-150 hover:bg-surface-2 hover:text-text-primary"
+    >
       <span className="text-base">{icon}</span>
       <span className="truncate">{label}</span>
     </button>

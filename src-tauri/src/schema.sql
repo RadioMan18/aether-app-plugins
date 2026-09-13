@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS journal_entries (
-    id TEXT PRIMARY KEY,
+    id TEXT PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
     content TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
 );
 
 CREATE TABLE IF NOT EXISTS todos (
-    id TEXT PRIMARY KEY,
+    id TEXT PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
     completed INTEGER NOT NULL DEFAULT 0,
     priority INTEGER NOT NULL DEFAULT 0,
@@ -39,3 +39,6 @@ CREATE TABLE IF NOT EXISTS plugins (
     permissions TEXT NOT NULL,
     installed_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+UPDATE journal_entries SET id = lower(hex(randomblob(16))) WHERE id IS NULL;
+UPDATE todos SET id = lower(hex(randomblob(16))) WHERE id IS NULL;

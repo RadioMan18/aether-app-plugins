@@ -38,7 +38,7 @@ export const broker = {
   async request<T = unknown>(params: BrokerRequestParams): Promise<BrokerResponse<T>> {
     const result = await sendRequest<BrokerResponse<T>>({
       type: "broker:request",
-      params,
+      params: { ...params },
     });
 
     return result ?? { success: false, error: "No response from broker" };

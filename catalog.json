@@ -39,6 +39,19 @@
       "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/goals.zip",
       "checksum": "sha256:e2d09131e93b7528219b904e353fbd6c49dab8496dcea755c67f405bb590ed67",
       "changelog": "Initial plugin catalog release."
+    },
+    {
+      "id": "pomodoro",
+      "name": "Pomodoro Timer",
+      "version": "0.1.0",
+      "category": "productivity",
+      "icon": "🍅",
+      "description": "Lightweight focus timer with work/short break/long break sessions.",
+      "author": "Aether",
+      "permissions": [],
+      "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/pomodoro.zip",
+      "checksum": "sha256:5795062f84ddeb94db5a34894e9b10151d0a42371c3233f8bc19ee344fa428aa",
+      "changelog": "Initial plugin catalog release."
     }
   ]
 }

@@ -21,8 +21,10 @@ export function usePluginStore(items: StoreItem[]): UsePluginStoreResult {
   const [category, setCategory] = useState<StoreCategory>("all");
   const [tab, setTab] = useState<StoreTab>("discover");
   const [selectedItem, setSelectedItem] = useState<StoreItem | null>(null);
-  const [installedIds, setInstalledIds] = useState<Set<string>>(
-    () => new Set(items.filter((item) => item.installed).map((item) => item.id))
+
+  const installedIds = useMemo(
+    () => new Set(items.filter((item) => item.installed).map((item) => item.id)),
+    [items]
   );
 
   const filteredItems = useMemo(() => {
@@ -43,15 +45,11 @@ export function usePluginStore(items: StoreItem[]): UsePluginStoreResult {
   }, [items, tab, category, query, installedIds]);
 
   const install = (id: string) => {
-    setInstalledIds((prev) => new Set([...prev, id]));
+    setSelectedItem((prev) => (prev?.id === id ? null : prev));
   };
 
   const uninstall = (id: string) => {
-    setInstalledIds((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+    setSelectedItem((prev) => (prev?.id === id ? null : prev));
   };
 
   return {

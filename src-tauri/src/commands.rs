@@ -1,7 +1,9 @@
 use crate::biometrics::{BiometricAuth, BiometricResult};
 use crate::database::{Database, PluginInfo};
 use crate::ipc::{PluginBroker, PluginRequest, PluginResponse};
+use crate::rss::{Feed, FeedItem, RssService};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::path::PathBuf;
 use tauri::AppHandle;
 
@@ -48,14 +50,14 @@ pub fn initialize_database(app: AppHandle) -> Result<DatabaseInfo, String> {
 pub fn ensure_database(app: AppHandle) -> Result<DatabaseInfo, String> {
     let app_data_dir = get_app_data_dir(&app)?;
     let db_path = app_data_dir.join("aether.db");
-    let db = if db_path.exists() {
+    let _db = if db_path.exists() {
         Database::open(app_data_dir).map_err(|e| e.to_string())?
     } else {
         Database::initialize_new(app_data_dir).map_err(|e| e.to_string())?
     };
 
     Ok(DatabaseInfo {
-        path: db.db_path().to_string_lossy().to_string(),
+        path: db_path.to_string_lossy().to_string(),
         initialized: true,
     })
 }
@@ -82,10 +84,10 @@ pub async fn unlock_database(app: AppHandle) -> Result<DatabaseInfo, String> {
         ));
     }
 
-    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let _db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
 
     Ok(DatabaseInfo {
-        path: db.db_path().to_string_lossy().to_string(),
+        path: db_path.to_string_lossy().to_string(),
         initialized: true,
     })
 }
@@ -138,7 +140,11 @@ pub fn plugin_ipc(app: AppHandle, request: PluginRequest) -> Result<PluginRespon
     log::info!("Plugin IPC database opened: plugin={}", request.plugin_id);
     let broker = PluginBroker::new(&db);
     let plugin_id = request.plugin_id.clone();
-    log::info!("Plugin IPC handling request: plugin={}, type={}", plugin_id, request.request_type);
+    log::info!(
+        "Plugin IPC handling request: plugin={}, type={}",
+        plugin_id,
+        request.request_type
+    );
     let response = broker.handle(&plugin_id, request)?;
     log::info!(
         "Plugin IPC response: plugin={}, id={}, success={}, error={:?}",
@@ -158,9 +164,76 @@ pub fn install_plugin(
     version: String,
     permissions: Vec<String>,
     zip_data: Vec<u8>,
+    checksum: Option<String>,
 ) -> Result<(), String> {
+    if let Some(expected) = checksum {
+        let mut hasher = Sha256::new();
+        hasher.update(&zip_data);
+        let actual = format!("sha256:{}", hex::encode(hasher.finalize()));
+        if actual != expected {
+            return Err(format!(
+                "Checksum mismatch: expected {}, got {}",
+                expected, actual
+            ));
+        }
+    }
+
     let app_data_dir = get_app_data_dir(&app)?;
     let db = Database::open(app_data_dir.clone()).map_err(|e| e.to_string())?;
+
+    let cursor = std::io::Cursor::new(&zip_data);
+    let mut archive =
+        zip::ZipArchive::new(cursor).map_err(|e| format!("Failed to read plugin zip: {}", e))?;
+
+    for i in 0..archive.len() {
+        let mut file = archive
+            .by_index(i)
+            .map_err(|e| format!("Failed to read zip entry: {}", e))?;
+        if file.name() == "plugin-manifest.json" {
+            let manifest_data: serde_json::Value = serde_json::from_reader(&mut file)
+                .map_err(|e| format!("Failed to parse plugin-manifest.json: {}", e))?;
+            if let Some(manifest_id) = manifest_data.get("id").and_then(|v| v.as_str()) {
+                if manifest_id != id {
+                    return Err(format!(
+                        "Manifest id mismatch: expected {}, got {}",
+                        id, manifest_id
+                    ));
+                }
+            }
+            if let Some(manifest_name) = manifest_data.get("name").and_then(|v| v.as_str()) {
+                if manifest_name != name {
+                    return Err(format!(
+                        "Manifest name mismatch: expected {}, got {}",
+                        name, manifest_name
+                    ));
+                }
+            }
+            if let Some(manifest_version) = manifest_data.get("version").and_then(|v| v.as_str()) {
+                if manifest_version != version {
+                    return Err(format!(
+                        "Manifest version mismatch: expected {}, got {}",
+                        version, manifest_version
+                    ));
+                }
+            }
+            if let Some(manifest_perms) =
+                manifest_data.get("permissions").and_then(|v| v.as_array())
+            {
+                let perm_strings: Vec<String> = manifest_perms
+                    .iter()
+                    .filter_map(|v| v.as_str().map(String::from))
+                    .collect();
+                if perm_strings != permissions {
+                    return Err(format!(
+                        "Manifest permissions mismatch: expected {:?}, got {:?}",
+                        permissions, perm_strings
+                    ));
+                }
+            }
+            break;
+        }
+    }
+
     db.register_plugin(&id, &name, &version, &permissions)?;
     db.extract_plugin(app_data_dir, &id, &zip_data).map(|_| ())
 }
@@ -198,7 +271,22 @@ pub fn seed_builtin_plugins(app: AppHandle) -> Result<(), String> {
             "1.0.0",
             vec!["db:read".to_string(), "db:write".to_string()],
         ),
-        ("goals", "Goals", "1.0.0", vec!["db:read".to_string(), "db:write".to_string()]),
+        (
+            "goals",
+            "Goals",
+            "1.0.0",
+            vec!["db:read".to_string(), "db:write".to_string()],
+        ),
+        (
+            "rss",
+            "RSS Reader",
+            "0.1.0",
+            vec![
+                "db:read".to_string(),
+                "db:write".to_string(),
+                "network:outbound".to_string(),
+            ],
+        ),
     ];
 
     for (id, name, version, permissions) in builtins {
@@ -206,6 +294,79 @@ pub fn seed_builtin_plugins(app: AppHandle) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn rss_add_feed(app: AppHandle, url: String) -> Result<Feed, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.add_feed(&url).await
+}
+
+#[tauri::command]
+pub async fn rss_refresh_feed(app: AppHandle, feed_id: String) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.refresh_feed(&feed_id).await
+}
+
+#[tauri::command]
+pub async fn rss_refresh_all_feeds(app: AppHandle) -> Result<usize, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.refresh_all_feeds().await
+}
+
+#[tauri::command]
+pub fn rss_list_feeds(app: AppHandle) -> Result<Vec<Feed>, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.list_feeds()
+}
+
+#[tauri::command]
+pub fn rss_list_items(
+    app: AppHandle,
+    feed_id: Option<String>,
+    unread_only: bool,
+    limit: Option<usize>,
+) -> Result<Vec<FeedItem>, String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.list_items(feed_id.as_deref(), unread_only, limit)
+}
+
+#[tauri::command]
+pub fn rss_mark_item_read(app: AppHandle, item_id: String, is_read: bool) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.mark_item_read(&item_id, is_read)
+}
+
+#[tauri::command]
+pub fn rss_mark_item_starred(
+    app: AppHandle,
+    item_id: String,
+    is_starred: bool,
+) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.mark_item_starred(&item_id, is_starred)
+}
+
+#[tauri::command]
+pub fn rss_delete_feed(app: AppHandle, feed_id: String) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let db = Database::open(app_data_dir).map_err(|e| e.to_string())?;
+    let service = RssService::new(&db);
+    service.delete_feed(&feed_id)
 }
 
 fn get_app_data_dir(_app: &AppHandle) -> Result<PathBuf, String> {

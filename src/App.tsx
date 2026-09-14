@@ -7,9 +7,9 @@ import { CommandPalette } from "@/components/CommandPalette/CommandPalette";
 import { CustomTitleBar } from "@/components/Shell/CustomTitleBar";
 import { PluginStore } from "@/components/PluginStore/PluginStore";
 import { useShellState } from "@/hooks/useShellState";
-import { STORE_ITEMS } from "@/lib/plugin-store/mock-data";
 import type { PluginManifest } from "@/types/plugin";
 import { invoke } from "@tauri-apps/api/core";
+import { usePluginManager } from "@/hooks/usePluginManager";
 
 const MOCK_PLUGINS: PluginManifest[] = [
   {
@@ -40,6 +40,15 @@ const MOCK_PLUGINS: PluginManifest[] = [
     sandboxed: true,
   },
   {
+    id: "rss",
+    name: "RSS Reader",
+    version: "0.1.0",
+    icon: "📰",
+    ui: { activityBar: true, sidebarSection: "RSS" },
+    permissions: ["db:read", "db:write", "network:outbound"],
+    sandboxed: true,
+  },
+  {
     id: "plugin-store",
     name: "Plugin Store",
     version: "1.0.0",
@@ -51,6 +60,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
 
 function App() {
   const shell = useShellState(MOCK_PLUGINS);
+  const { catalogItems } = usePluginManager();
 
   useEffect(() => {
     const seed = async () => {
@@ -74,6 +84,8 @@ function App() {
     [shell.activePluginId]
   );
 
+  const storeItems = catalogItems.length > 0 ? catalogItems : [];
+
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-canvas text-text-primary">
       <CustomTitleBar />
@@ -92,7 +104,7 @@ function App() {
           plugins={MOCK_PLUGINS}
         />
         {activePlugin?.id === "plugin-store" ? (
-          <PluginStore items={STORE_ITEMS} />
+          <PluginStore items={storeItems} />
         ) : (
           <MainContent activePlugin={activePlugin} />
         )}

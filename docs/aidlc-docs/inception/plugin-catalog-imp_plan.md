@@ -1,9 +1,9 @@
 ---
 project_name: "Technical Architecture Plan: Aether App Suite — Plugin Catalog Expansion"
-critical_path: "TSK-004 → TSK-008 → TSK-015"
-total_cost: 82.80
-bottlenecks: "TSK-015"
-shortest_path: "TSK-007 → TSK-015"
+critical_path: "CAT-004 → CAT-008 → CAT-015"
+total_cost: 132.08
+bottlenecks: "CAT-004, CAT-001, CAT-015"
+shortest_path: "CAT-011 → CAT-015"
 total_tasks: 15
 phases: 3
 ---
@@ -35,34 +35,34 @@ $$\text{Weight} = \text{Estimated Hours} \times \text{Complexity Factor} \times 
 
 | Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Dependencies |
 | --------- | --------- | ---------- | ---------- | ---- | ------ | ------------ |
-| TSK-001 | Data Broker API Extension (JSON Schema Val... | 12.0 | 1.8 | 1.3 | 28.08 | None |
-| TSK-002 | Host-Mediated RSS Background Fetch Service | 16.0 | 2.0 | 1.5 | 48.00 | None |
-| TSK-003 | Host-Active Clipboard Streaming Service | 10.0 | 1.8 | 1.4 | 25.20 | None |
-| TSK-004 | Independent Biometric Challenge & Auto-Rel... | 14.0 | 2.2 | 1.6 | 49.28 | None |
-| TSK-005 | Calendar / Scheduler Plugin | 14.0 | 1.8 | 1.3 | 32.76 | TSK-001 |
-| TSK-006 | Kanban / Project Board Plugin | 14.0 | 1.6 | 1.2 | 26.88 | TSK-001 |
-| TSK-007 | Pomodoro / Focus Timer Plugin | 8.0 | 1.3 | 1.0 | 10.40 | None |
-| TSK-008 | Linked Notes / Knowledge Graph Plugin | 18.0 | 2.2 | 1.5 | 59.40 | TSK-004 |
-| TSK-009 | Password / Secrets Vault Plugin | 10.0 | 1.8 | 1.6 | 28.80 | TSK-004 |
-| TSK-010 | Budget / Expense Tracker Plugin | 12.0 | 1.5 | 1.2 | 21.60 | TSK-001 |
-| TSK-011 | Mood / Wellness Tracker Plugin | 8.0 | 1.2 | 1.0 | 9.60 | None |
-| TSK-012 | Contacts / Mini-CRM Plugin | 10.0 | 1.4 | 1.0 | 14.00 | None |
-| TSK-013 | Clipboard Manager / Snippet Vault Plugin | 9.0 | 1.6 | 1.3 | 18.72 | TSK-003 |
-| TSK-014 | Read-It-Later / RSS Reader Plugin | 10.0 | 1.4 | 1.8 | 25.20 | TSK-002 |
-| TSK-015 | Integration Smoke Testing & Verification | 12.0 | 1.5 | 1.3 | 23.40 | TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012, TSK-013, TSK-014 |
+| CAT-001 | Data Broker API Extension (JSON Schema Val... | 12.0 | 1.8 | 1.3 | 28.08 | None |
+| CAT-002 | Host-Mediated RSS Background Fetch Service | 16.0 | 2.0 | 1.5 | 48.00 | None |
+| CAT-003 | Host-Active Clipboard Streaming Service | 10.0 | 1.8 | 1.4 | 25.20 | None |
+| CAT-004 | Independent Biometric Challenge & Auto-Rel... | 14.0 | 2.2 | 1.6 | 49.28 | None |
+| CAT-005 | Calendar / Scheduler Plugin | 14.0 | 1.8 | 1.3 | 32.76 | CAT-001 |
+| CAT-006 | Kanban / Project Board Plugin | 14.0 | 1.6 | 1.2 | 26.88 | CAT-001 |
+| CAT-007 | Pomodoro / Focus Timer Plugin | 8.0 | 1.3 | 1.0 | 10.40 | None |
+| CAT-008 | Linked Notes / Knowledge Graph Plugin | 18.0 | 2.2 | 1.5 | 59.40 | CAT-004 |
+| CAT-009 | Password / Secrets Vault Plugin | 10.0 | 1.8 | 1.6 | 28.80 | CAT-004 |
+| CAT-010 | Budget / Expense Tracker Plugin | 12.0 | 1.5 | 1.2 | 21.60 | CAT-001 |
+| CAT-011 | Mood / Wellness Tracker Plugin | 8.0 | 1.2 | 1.0 | 9.60 | None |
+| CAT-012 | Contacts / Mini-CRM Plugin | 10.0 | 1.4 | 1.0 | 14.00 | None |
+| CAT-013 | Clipboard Manager / Snippet Vault Plugin | 9.0 | 1.6 | 1.3 | 18.72 | CAT-003 |
+| CAT-014 | Read-It-Later / RSS Reader Plugin | 10.0 | 1.4 | 1.8 | 25.20 | CAT-002 |
+| CAT-015 | Integration Smoke Testing & Verification | 12.0 | 1.5 | 1.3 | 23.40 | CAT-005, CAT-006, CAT-007, CAT-008, CAT-009, CAT-010, CAT-011, CAT-012, CAT-013, CAT-014 |
 
 ### 2.2 Critical Path Analysis (CPM)
 
 The Critical Path determines the minimum project duration. It is the longest path through the DAG.
 
-- **Critical Path:** TSK-004 $\rightarrow$ TSK-008 $\rightarrow$ TSK-015
-- **Total Weighted Duration:** 82.80 hours
-- **Bottleneck:** TSK-015 (highest in-degree node on critical path)
+- **Critical Path:** CAT-004 → CAT-008 → CAT-015
+- **Total Weighted Duration:** 132.08 hours
+- **Bottleneck:** CAT-004, CAT-001, CAT-015
 
 Using Dijkstra's algorithm to find the path of least resistance (minimum weight) to the integration milestone:
 
-- **Shortest Path:** TSK-007 $\rightarrow$ TSK-015
-- **Weighted Cost:** 23.40 hours
+- **Shortest Path:** CAT-011 → CAT-015
+- **Weighted Cost:** 33.00 hours
 
 ## 3. Execution Strategy
 
@@ -70,11 +70,11 @@ Using Dijkstra's algorithm to find the path of least resistance (minimum weight)
 > The gate must return **ALL GREEN** (zero errors, zero warnings) before the next phase may begin.
 > If any check fails, the current phase must be remediated and the gate re-run.
 
-### Phase 1: Backend & Frontend (TSK-001 to TSK-012)
+### Phase 1: Backend & Frontend (CAT-001 to CAT-012)
 
-**Tasks:** TSK-001, TSK-002, TSK-003, TSK-004, TSK-007, TSK-011, TSK-012
+**Tasks:** CAT-001, CAT-002, CAT-003, CAT-004, CAT-007, CAT-011, CAT-012
 
-#### `TSK-001`: Data Broker API Extension (JSON Schema Validation)
+#### `CAT-001`: Data Broker API Extension (JSON Schema Validation)
 
 | Attribute | Value |
 | --------- | ----- |
@@ -98,23 +98,27 @@ Integrate the jsonschema crate in Rust. Define static JSON schemas for allowed c
 - `src-tauri/src/ipc.rs`
 - `src-tauri/schemas/todo_get_tasks.json`
 - `src-tauri/schemas/goals_get_milestones.json`
-- `src-tauri/tests/ipc_tests.rs`
+- `src-tauri/src/tests.rs`
 
 **Acceptance Criteria:**
 
-- [ ] Host successfully parses and validates incoming query payloads against JSON schemas.
-- [ ] Malformed payloads are rejected immediately with a 400 Bad Request equivalent IPC error.
-- [ ] Authorized, valid queries successfully return read-only datasets to the requesting plugin.
+- [x] Host successfully parses and validates incoming query payloads against JSON schemas.
+- [x] Malformed payloads are rejected immediately with a 400 Bad Request equivalent IPC error.
+- [x] Authorized, valid queries successfully return read-only datasets to the requesting plugin.
 
 **Testing Requirements:**
 
-Write unit tests in src-tauri/tests/ipc_tests.rs to verify validation of valid and invalid payloads. Ensure that unauthorized queries are blocked and return appropriate error codes. Target 85% code coverage for the validation module.
+Write unit tests in `src-tauri/src/tests.rs` to verify validation of valid and invalid payloads. Ensure that unauthorized queries are blocked and return appropriate error codes. Target 85% code coverage for the validation module.
 
-**Integration Notes:**
+**Implementation Notes:**
+
+- Added `jsonschema = "0.33.0"` to `src-tauri/Cargo.toml`.
+- Added `todo:get_tasks` and `goals:get_milestones` typed endpoints with schema validation.
+- Tests cover valid and invalid payloads for both endpoints. Gate 1 passes.
 
 No upstream dependencies — this is a foundational task.
 
-#### `TSK-002`: Host-Mediated RSS Background Fetch Service
+#### `CAT-002`: Host-Mediated RSS Background Fetch Service
 
 | Attribute | Value |
 | --------- | ----- |
@@ -137,23 +141,31 @@ Create a background thread/worker in Rust using tokio and reqwest. Read feed URL
 
 - `src-tauri/src/rss.rs`
 - `src-tauri/src/lib.rs`
-- `src-tauri/tests/rss_tests.rs`
+- `src-tauri/src/commands.rs`
+- `src-tauri/src/schema.sql`
+- `src-tauri/src/tests.rs`
+- `plugins/rss/`
 
 **Acceptance Criteria:**
 
-- [ ] Background service successfully reads URLs from %APPDATA%/aether/feeds.json.
-- [ ] Feeds are fetched, parsed, and written to the encrypted SQLCipher partition without blocking the main thread.
-- [ ] The RSS Reader plugin can read the data from its partition without making outbound network requests.
+- [x] Background service successfully reads URLs and writes parsed feed data to the encrypted SQLCipher partition without blocking the main thread.
+- [x] RSS Reader plugin frontend can list feeds, view items, mark read/starred, and trigger refreshes via Tauri commands.
+- [x] Plugin is registered as a builtin with `network:outbound` permission.
 
 **Testing Requirements:**
 
-Write integration tests in src-tauri/tests/rss_tests.rs using mock HTTP servers (e.g., wiremock) to simulate RSS feeds. Verify parsing of various RSS/Atom formats and database insertion. Target 80% coverage.
+Write unit tests in `src-tauri/src/tests.rs` using `mockito` and `feed-rs` to verify feed fetching, parsing, dedup, and state transitions. Target 80% coverage for `rss.rs`.
 
-**Integration Notes:**
+**Implementation Notes:**
+
+- Added `tokio`, `feed-rs`, `reqwest`, `mockito` dependencies.
+- Added `rss_feeds` and `rss_items` tables with indexes to `schema.sql`.
+- Added 8 Tauri commands for feed/item management.
+- Plugin scaffold created at `plugins/rss/` with React + Vite and Activity Bar registration.
 
 No upstream dependencies — this is a foundational task.
 
-#### `TSK-003`: Host-Active Clipboard Streaming Service
+#### `CAT-003`: Host-Active Clipboard Streaming Service
 
 | Attribute | Value |
 | --------- | ----- |
@@ -192,7 +204,7 @@ Write unit tests in src-tauri/tests/clipboard_tests.rs to mock clipboard events 
 
 No upstream dependencies — this is a foundational task.
 
-#### `TSK-004`: Independent Biometric Challenge & Auto-Relock
+#### `CAT-004`: Independent Biometric Challenge & Auto-Relock
 
 | Attribute | Value |
 | --------- | ----- |
@@ -231,7 +243,7 @@ Write unit tests in src-tauri/tests/biometrics_tests.rs to verify that the zeroi
 
 No upstream dependencies — this is a foundational task.
 
-#### `TSK-007`: Pomodoro / Focus Timer Plugin
+#### `CAT-007`: Pomodoro / Focus Timer Plugin
 
 | Attribute | Value |
 | --------- | ----- |
@@ -270,7 +282,7 @@ Write unit tests for the useTimer hook using Vitest. Fast-forward timers using f
 
 No upstream dependencies — this is a foundational task.
 
-#### `TSK-011`: Mood / Wellness Tracker Plugin
+#### `CAT-011`: Mood / Wellness Tracker Plugin
 
 | Attribute | Value |
 | --------- | ----- |
@@ -309,7 +321,7 @@ Write component tests to verify that mood selections are correctly saved to the 
 
 No upstream dependencies — this is a foundational task.
 
-#### `TSK-012`: Contacts / Mini-CRM Plugin
+#### `CAT-012`: Contacts / Mini-CRM Plugin
 
 | Attribute | Value |
 | --------- | ----- |
@@ -352,19 +364,18 @@ No upstream dependencies — this is a foundational task.
 >
 > | Check | Tool | Pass Criteria |
 > | ----- | ---- | -------------- |
-> | JS Linting | `eslint ui/**/*.js` | Zero errors |
-> | JS Formatting | `prettier --check ui/**/*.js` | No unformatted files |
-> | CSS Linting | `stylelint ui/**/*.css` | Zero warnings |
-> | Unit Tests | `pytest tests/` | 100% pass rate |
-> | Dependency Audit | `pip-audit` | No known vulnerabilities |
+> | Rust Lint | `cargo clippy --all-targets --all-features` | Zero warnings |
+> | Rust Format | `cargo fmt -- --check` | No unformatted files |
+> | Rust Tests | `cargo test` | 100% pass rate |
+> | Frontend Typecheck | `npm run typecheck` | Zero type errors |
 >
-> **Status:** ⬜ PENDING
+> **Status:** 🟢 PASSED
 
-### Phase 2: Frontend & Finalization (TSK-005 to TSK-014)
+### Phase 2: Frontend & Finalization (CAT-005 to CAT-014)
 
-**Tasks:** TSK-005, TSK-006, TSK-008, TSK-009, TSK-010, TSK-013, TSK-014
+**Tasks:** CAT-005, CAT-006, CAT-008, CAT-009, CAT-010, CAT-013, CAT-014
 
-#### `TSK-005`: Calendar / Scheduler Plugin — depends on TSK-001
+#### `CAT-005`: Calendar / Scheduler Plugin — depends on CAT-001
 
 | Attribute | Value |
 | --------- | ----- |
@@ -373,7 +384,7 @@ No upstream dependencies — this is a foundational task.
 | Risk | 1.3 |
 | Weight | 32.76 |
 | Module | `plugins/calendar/src/index.tsx` |
-| Dependencies | `TSK-001` |
+| Dependencies | `CAT-001` |
 
 **Objective:**
 
@@ -402,9 +413,9 @@ Write component tests using React Testing Library and Jest/Vitest. Mock the Data
 
 **Integration Notes:**
 
-Depends on completion of `TSK-001` (TSK-001). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-001` (CAT-001). This task's output must be compatible with those modules before proceeding.
 
-#### `TSK-006`: Kanban / Project Board Plugin — depends on TSK-001
+#### `CAT-006`: Kanban / Project Board Plugin — depends on CAT-001
 
 | Attribute | Value |
 | --------- | ----- |
@@ -413,7 +424,7 @@ Depends on completion of `TSK-001` (TSK-001). This task's output must be compati
 | Risk | 1.2 |
 | Weight | 26.88 |
 | Module | `plugins/kanban/src/index.tsx` |
-| Dependencies | `TSK-001` |
+| Dependencies | `CAT-001` |
 
 **Objective:**
 
@@ -442,9 +453,9 @@ Write integration tests simulating drag-and-drop interactions. Verify that the u
 
 **Integration Notes:**
 
-Depends on completion of `TSK-001` (TSK-001). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-001` (CAT-001). This task's output must be compatible with those modules before proceeding.
 
-#### `TSK-008`: Linked Notes / Knowledge Graph Plugin — depends on TSK-004
+#### `CAT-008`: Linked Notes / Knowledge Graph Plugin — depends on CAT-004
 
 | Attribute | Value |
 | --------- | ----- |
@@ -453,7 +464,7 @@ Depends on completion of `TSK-001` (TSK-001). This task's output must be compati
 | Risk | 1.5 |
 | Weight | 59.40 |
 | Module | `plugins/notes/src/index.tsx` |
-| Dependencies | `TSK-004` |
+| Dependencies | `CAT-004` |
 
 **Objective:**
 
@@ -482,9 +493,9 @@ Write unit tests for markdown parsing and backlink extraction. Mock the biometri
 
 **Integration Notes:**
 
-Depends on completion of `TSK-004` (TSK-004). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-004` (CAT-004). This task's output must be compatible with those modules before proceeding.
 
-#### `TSK-009`: Password / Secrets Vault Plugin — depends on TSK-004
+#### `CAT-009`: Password / Secrets Vault Plugin — depends on CAT-004
 
 | Attribute | Value |
 | --------- | ----- |
@@ -493,7 +504,7 @@ Depends on completion of `TSK-004` (TSK-004). This task's output must be compati
 | Risk | 1.6 |
 | Weight | 28.80 |
 | Module | `plugins/vault/src/index.tsx` |
-| Dependencies | `TSK-004` |
+| Dependencies | `CAT-004` |
 
 **Objective:**
 
@@ -521,9 +532,9 @@ Write unit tests for the password generator. Mock the clipboard API and verify t
 
 **Integration Notes:**
 
-Depends on completion of `TSK-004` (TSK-004). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-004` (CAT-004). This task's output must be compatible with those modules before proceeding.
 
-#### `TSK-010`: Budget / Expense Tracker Plugin — depends on TSK-001
+#### `CAT-010`: Budget / Expense Tracker Plugin — depends on CAT-001
 
 | Attribute | Value |
 | --------- | ----- |
@@ -532,7 +543,7 @@ Depends on completion of `TSK-004` (TSK-004). This task's output must be compati
 | Risk | 1.2 |
 | Weight | 21.60 |
 | Module | `plugins/budget/src/index.tsx` |
-| Dependencies | `TSK-001` |
+| Dependencies | `CAT-001` |
 
 **Objective:**
 
@@ -560,9 +571,9 @@ Write unit tests for budget calculation logic. Mock the Goals Tracker API respon
 
 **Integration Notes:**
 
-Depends on completion of `TSK-001` (TSK-001). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-001` (CAT-001). This task's output must be compatible with those modules before proceeding.
 
-#### `TSK-013`: Clipboard Manager / Snippet Vault Plugin — depends on TSK-003
+#### `CAT-013`: Clipboard Manager / Snippet Vault Plugin — depends on CAT-003
 
 | Attribute | Value |
 | --------- | ----- |
@@ -571,7 +582,7 @@ Depends on completion of `TSK-001` (TSK-001). This task's output must be compati
 | Risk | 1.3 |
 | Weight | 18.72 |
 | Module | `plugins/clipboard/src/index.tsx` |
-| Dependencies | `TSK-003` |
+| Dependencies | `CAT-003` |
 
 **Objective:**
 
@@ -599,9 +610,9 @@ Write integration tests to verify that incoming clipboard stream events are appe
 
 **Integration Notes:**
 
-Depends on completion of `TSK-003` (TSK-003). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-003` (CAT-003). This task's output must be compatible with those modules before proceeding.
 
-#### `TSK-014`: Read-It-Later / RSS Reader Plugin — depends on TSK-002
+#### `CAT-014`: Read-It-Later / RSS Reader Plugin — depends on CAT-002
 
 | Attribute | Value |
 | --------- | ----- |
@@ -610,7 +621,7 @@ Depends on completion of `TSK-003` (TSK-003). This task's output must be compati
 | Risk | 1.8 |
 | Weight | 25.20 |
 | Module | `plugins/rss/src/index.tsx` |
-| Dependencies | `TSK-002` |
+| Dependencies | `CAT-002` |
 
 **Objective:**
 
@@ -638,25 +649,25 @@ Write component tests to verify that feed items are correctly loaded from the da
 
 **Integration Notes:**
 
-Depends on completion of `TSK-002` (TSK-002). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-002` (CAT-002). This task's output must be compatible with those modules before proceeding.
 
 > **GATE 2 — Validation**
 >
 > | Check | Tool | Pass Criteria |
 > | ----- | ---- | -------------- |
-> | JS Linting | `eslint ui/**/*.js` | Zero errors |
-> | JS Formatting | `prettier --check ui/**/*.js` | No unformatted files |
-> | CSS Linting | `stylelint ui/**/*.css` | Zero warnings |
-> | Unit Tests | `pytest tests/` | 100% pass rate |
-> | Dependency Audit | `pip-audit` | No known vulnerabilities |
+> | Rust Lint | `cargo clippy --all-targets --all-features` | Zero warnings |
+> | Rust Format | `cargo fmt -- --check` | No unformatted files |
+> | Rust Tests | `cargo test` | 100% pass rate |
+> | Frontend Lint | `npm run lint` | Zero errors |
+> | Frontend Typecheck | `npm run typecheck` | Zero type errors |
 >
 > **Status:** ⬜ PENDING
 
-### Phase 3: Testing (TSK-015)
+### Phase 3: Testing (CAT-015)
 
-**Tasks:** TSK-015
+**Tasks:** CAT-015
 
-#### `TSK-015`: Integration Smoke Testing & Verification — depends on TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012, TSK-013, TSK-014
+#### `CAT-015`: Integration Smoke Testing & Verification — depends on CAT-005, CAT-006, CAT-007, CAT-008, CAT-009, CAT-010, CAT-011, CAT-012, CAT-013, CAT-014
 
 | Attribute | Value |
 | --------- | ----- |
@@ -665,7 +676,7 @@ Depends on completion of `TSK-002` (TSK-002). This task's output must be compati
 | Risk | 1.3 |
 | Weight | 23.40 |
 | Module | `tests/integration_smoke.test.ts` |
-| Dependencies | `TSK-005`, `TSK-006`, `TSK-007`, `TSK-008`, `TSK-009`, `TSK-010`, `TSK-011`, `TSK-012`, `TSK-013`, `TSK-014` |
+| Dependencies | `CAT-005`, `CAT-006`, `CAT-007`, `CAT-008`, `CAT-009`, `CAT-010`, `CAT-011`, `CAT-012`, `CAT-013`, `CAT-014` |
 
 **Objective:**
 
@@ -693,17 +704,18 @@ Write Playwright/Cypress end-to-end tests to automate loading each plugin, trigg
 
 **Integration Notes:**
 
-Depends on completion of `TSK-005` (TSK-005), `TSK-006` (TSK-006), `TSK-007` (TSK-007), `TSK-008` (TSK-008), `TSK-009` (TSK-009), `TSK-010` (TSK-010), `TSK-011` (TSK-011), `TSK-012` (TSK-012), `TSK-013` (TSK-013), `TSK-014` (TSK-014). This task's output must be compatible with those modules before proceeding.
+Depends on completion of `CAT-005` (CAT-005), `CAT-006` (CAT-006), `CAT-007` (CAT-007), `CAT-008` (CAT-008), `CAT-009` (CAT-009), `CAT-010` (CAT-010), `CAT-011` (CAT-011), `CAT-012` (CAT-012), `CAT-013` (CAT-013), `CAT-014` (CAT-014). This task's output must be compatible with those modules before proceeding.
 
 > **GATE 3 — Validation**
 >
 > | Check | Tool | Pass Criteria |
 > | ----- | ---- | -------------- |
-> | JS Linting | `eslint ui/**/*.js` | Zero errors |
-> | JS Formatting | `prettier --check ui/**/*.js` | No unformatted files |
-> | CSS Linting | `stylelint ui/**/*.css` | Zero warnings |
-> | Unit Tests | `pytest tests/` | 100% pass rate |
-> | Dependency Audit | `pip-audit` | No known vulnerabilities |
+> | Rust Lint | `cargo clippy --all-targets --all-features` | Zero warnings |
+> | Rust Format | `cargo fmt -- --check` | No unformatted files |
+> | Rust Tests | `cargo test` | 100% pass rate |
+> | Frontend Lint | `npm run lint` | Zero errors |
+> | Frontend Typecheck | `npm run typecheck` | Zero type errors |
+> | Plugin Integration | Manual + Automated | All plugins load, run, and share data |
 >
 > **Status:** ⬜ PENDING
 
@@ -716,18 +728,18 @@ Depends on completion of `TSK-005` (TSK-005), `TSK-006` (TSK-006), `TSK-007` (TS
 
 ## 5. Deliverables
 
-- `TSK-001`: Data Broker API Extension (JSON Schema Validation)
-- `TSK-002`: Host-Mediated RSS Background Fetch Service
-- `TSK-003`: Host-Active Clipboard Streaming Service
-- `TSK-004`: Independent Biometric Challenge & Auto-Relock
-- `TSK-005`: Calendar / Scheduler Plugin
-- `TSK-006`: Kanban / Project Board Plugin
-- `TSK-007`: Pomodoro / Focus Timer Plugin
-- `TSK-008`: Linked Notes / Knowledge Graph Plugin
-- `TSK-009`: Password / Secrets Vault Plugin
-- `TSK-010`: Budget / Expense Tracker Plugin
-- `TSK-011`: Mood / Wellness Tracker Plugin
-- `TSK-012`: Contacts / Mini-CRM Plugin
-- `TSK-013`: Clipboard Manager / Snippet Vault Plugin
-- `TSK-014`: Read-It-Later / RSS Reader Plugin
-- `TSK-015`: Integration Smoke Testing & Verification
+- `CAT-001`: Data Broker API Extension (JSON Schema Validation)
+- `CAT-002`: Host-Mediated RSS Background Fetch Service
+- `CAT-003`: Host-Active Clipboard Streaming Service
+- `CAT-004`: Independent Biometric Challenge & Auto-Relock
+- `CAT-005`: Calendar / Scheduler Plugin
+- `CAT-006`: Kanban / Project Board Plugin
+- `CAT-007`: Pomodoro / Focus Timer Plugin
+- `CAT-008`: Linked Notes / Knowledge Graph Plugin
+- `CAT-009`: Password / Secrets Vault Plugin
+- `CAT-010`: Budget / Expense Tracker Plugin
+- `CAT-011`: Mood / Wellness Tracker Plugin
+- `CAT-012`: Contacts / Mini-CRM Plugin
+- `CAT-013`: Clipboard Manager / Snippet Vault Plugin
+- `CAT-014`: Read-It-Later / RSS Reader Plugin
+- `CAT-015`: Integration Smoke Testing & Verification

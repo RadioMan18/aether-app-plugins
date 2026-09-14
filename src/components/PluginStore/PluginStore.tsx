@@ -50,13 +50,7 @@ export function PluginStore({ items }: PluginStoreProps) {
     if (!item) return;
 
     try {
-      await installPlugin(
-        item.id,
-        item.name,
-        item.version,
-        item.permissions,
-        new ArrayBuffer(0)
-      );
+      await installPlugin(item);
     } catch {
       // error handled by hook
     }

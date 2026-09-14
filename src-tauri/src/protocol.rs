@@ -28,7 +28,12 @@ impl PluginProtocol {
 
         let path = request.uri().path();
         let relative_path = path.strip_prefix('/').unwrap_or(path);
-        log::info!("Plugin request: uri={}, base={}, relative={}", request.uri(), plugins_dir.display(), relative_path);
+        log::info!(
+            "Plugin request: uri={}, base={}, relative={}",
+            request.uri(),
+            plugins_dir.display(),
+            relative_path
+        );
 
         if relative_path.is_empty() || relative_path.ends_with('/') {
             return Self::not_found("Directory listing not allowed");

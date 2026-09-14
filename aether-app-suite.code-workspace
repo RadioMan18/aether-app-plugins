@@ -2,9 +2,6 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../project-planner-v2"
 		}
 	],
 	"settings": {}

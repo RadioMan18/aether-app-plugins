@@ -4,7 +4,7 @@
 
 - **Active Branch:** `main`
 - **Current Phase:** 🔵 Inception
-- **Overall Completion:** 81%
+- **Overall Completion:** 90%
 
 ## 2. Task Board
 
@@ -41,6 +41,9 @@ Each task must be marked as `[ ]` (Todo), `[/]` (In Progress), or `[x]` (Complet
   - Registered in `src/App.tsx` `MOCK_PLUGINS` with `activityBar: true` and `db:read`/`db:write` permissions
   - Activity bar, sidebar nav, and `switch-goals` command wired in host shell
   - Cross-plugin data sharing: GoalEditor queries `todos` table to display related tasks matching goal title
+  - Plugin catalog infrastructure: Wired Plugin Store UI to remote catalog, added zip packaging script, checksum verification in Rust install path, and plugin evaluation gate documentation
+  - CAT-001: IPC schema validation with JSON Schema, new typed endpoints for todo/goals queries, and Rust unit tests
+  - CAT-002: RSS plugin backend with feed fetching/parsing/storage, Tauri commands, plugin scaffold, and tests
 
 ### 🟡 Operations
 

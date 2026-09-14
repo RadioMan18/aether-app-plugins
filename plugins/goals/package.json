@@ -1,12 +1,14 @@
 {
   "name": "aether-plugin-goals",
+  "id": "goals",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dist:zip": "node ../../scripts/zip-plugin.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

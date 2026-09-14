@@ -33,76 +33,76 @@ $$\text{Weight} = \text{Estimated Hours} \times \text{Complexity Factor} \times 
 
 | Task ID | Task Name | Est. Hours | Complexity | Risk | Weight | Prerequisites | Phase |
 | :--- | :--- | :---: | :---: | :---: | :---: | :--- | :--- |
-| **TSK-001** | Data Broker API Extension (JSON Schema Validation) | 12.0 | 1.8 | 1.3 | **28.08** | None | 🔵 Inception |
-| **TSK-002** | Host-Mediated RSS Background Fetch Service | 16.0 | 2.0 | 1.5 | **48.00** | None | 🔵 Inception |
-| **TSK-003** | Host-Active Clipboard Streaming Service | 10.0 | 1.8 | 1.4 | **25.20** | None | 🔵 Inception |
-| **TSK-004** | Independent Biometric Challenge & Auto-Relock | 14.0 | 2.2 | 1.6 | **49.28** | None | 🔵 Inception |
-| **TSK-005** | Calendar / Scheduler Plugin | 14.0 | 1.8 | 1.3 | **32.76** | TSK-001 | 🟢 Construction |
-| **TSK-006** | Kanban / Project Board Plugin | 14.0 | 1.6 | 1.2 | **26.88** | TSK-001 | 🟢 Construction |
-| **TSK-007** | Pomodoro / Focus Timer Plugin | 8.0 | 1.3 | 1.0 | **10.40** | None | 🟢 Construction |
-| **TSK-008** | Linked Notes / Knowledge Graph Plugin | 18.0 | 2.2 | 1.5 | **59.40** | TSK-004 | 🟢 Construction |
-| **TSK-009** | Password / Secrets Vault Plugin | 10.0 | 1.8 | 1.6 | **28.80** | TSK-004 | 🟢 Construction |
-| **TSK-010** | Budget / Expense Tracker Plugin | 12.0 | 1.5 | 1.2 | **21.60** | TSK-001 | 🟢 Construction |
-| **TSK-011** | Mood / Wellness Tracker Plugin | 8.0 | 1.2 | 1.0 | **9.60** | None | 🟢 Construction |
-| **TSK-012** | Contacts / Mini-CRM Plugin | 10.0 | 1.4 | 1.0 | **14.00** | None | 🟢 Construction |
-| **TSK-013** | Clipboard Manager / Snippet Vault Plugin | 9.0 | 1.6 | 1.3 | **18.72** | TSK-003 | 🟢 Construction |
-| **TSK-014** | Read-It-Later / RSS Reader Plugin | 10.0 | 1.4 | 1.8 | **25.20** | TSK-002 | 🟢 Construction |
-| **TSK-015** | Integration Smoke Testing & Verification | 12.0 | 1.5 | 1.3 | **23.40** | TSK-005, TSK-006, TSK-007, TSK-008, TSK-009, TSK-010, TSK-011, TSK-012, TSK-013, TSK-014 | 🟡 Operations |
+| **CAT-001** | Data Broker API Extension (JSON Schema Validation) | 12.0 | 1.8 | 1.3 | **28.08** | None | 🔵 Inception |
+| **CAT-002** | Host-Mediated RSS Background Fetch Service | 16.0 | 2.0 | 1.5 | **48.00** | None | 🔵 Inception |
+| **CAT-003** | Host-Active Clipboard Streaming Service | 10.0 | 1.8 | 1.4 | **25.20** | None | 🔵 Inception |
+| **CAT-004** | Independent Biometric Challenge & Auto-Relock | 14.0 | 2.2 | 1.6 | **49.28** | None | 🔵 Inception |
+| **CAT-005** | Calendar / Scheduler Plugin | 14.0 | 1.8 | 1.3 | **32.76** | CAT-001 | 🟢 Construction |
+| **CAT-006** | Kanban / Project Board Plugin | 14.0 | 1.6 | 1.2 | **26.88** | CAT-001 | 🟢 Construction |
+| **CAT-007** | Pomodoro / Focus Timer Plugin | 8.0 | 1.3 | 1.0 | **10.40** | None | 🟢 Construction |
+| **CAT-008** | Linked Notes / Knowledge Graph Plugin | 18.0 | 2.2 | 1.5 | **59.40** | CAT-004 | 🟢 Construction |
+| **CAT-009** | Password / Secrets Vault Plugin | 10.0 | 1.8 | 1.6 | **28.80** | CAT-004 | 🟢 Construction |
+| **CAT-010** | Budget / Expense Tracker Plugin | 12.0 | 1.5 | 1.2 | **21.60** | CAT-001 | 🟢 Construction |
+| **CAT-011** | Mood / Wellness Tracker Plugin | 8.0 | 1.2 | 1.0 | **9.60** | None | 🟢 Construction |
+| **CAT-012** | Contacts / Mini-CRM Plugin | 10.0 | 1.4 | 1.0 | **14.00** | None | 🟢 Construction |
+| **CAT-013** | Clipboard Manager / Snippet Vault Plugin | 9.0 | 1.6 | 1.3 | **18.72** | CAT-003 | 🟢 Construction |
+| **CAT-014** | Read-It-Later / RSS Reader Plugin | 10.0 | 1.4 | 1.8 | **25.20** | CAT-002 | 🟢 Construction |
+| **CAT-015** | Integration Smoke Testing & Verification | 12.0 | 1.5 | 1.3 | **23.40** | CAT-005, CAT-006, CAT-007, CAT-008, CAT-009, CAT-010, CAT-011, CAT-012, CAT-013, CAT-014 | 🟡 Operations |
 
 ### 2.2 Dependency Graph (DAG)
 
 ```mermaid
 graph TD
 %% Host-Level Services (Inception Phase)
-TSK-001[TSK-001: Data Broker API Extension] --> TSK-005[TSK-005: Calendar Plugin]
-TSK-001 --> TSK-006[TSK-006: Kanban Plugin]
-TSK-001 --> TSK-010[TSK-010: Budget Plugin]
-TSK-002[TSK-002: RSS Fetch Service] --> TSK-014[TSK-014: RSS Reader Plugin]
-TSK-003[TSK-003: Clipboard Streamer] --> TSK-013[TSK-013: Clipboard Manager]
-TSK-004[TSK-004: Biometric Key Release] --> TSK-008[TSK-008: Linked Notes Plugin]
-TSK-004 --> TSK-009[TSK-009: Password Vault Plugin]
+CAT-001[CAT-001: Data Broker API Extension] --> CAT-005[CAT-005: Calendar Plugin]
+CAT-001 --> CAT-006[CAT-006: Kanban Plugin]
+CAT-001 --> CAT-010[CAT-010: Budget Plugin]
+CAT-002[CAT-002: RSS Fetch Service] --> CAT-014[CAT-014: RSS Reader Plugin]
+CAT-003[CAT-003: Clipboard Streamer] --> CAT-013[CAT-013: Clipboard Manager]
+CAT-004[CAT-004: Biometric Key Release] --> CAT-008[CAT-008: Linked Notes Plugin]
+CAT-004 --> CAT-009[CAT-009: Password Vault Plugin]
 
 %% Independent Plugins
-TSK-007[TSK-007: Pomodoro Timer] --> TSK-015[TSK-015: Smoke Testing]
-TSK-011[TSK-011: Mood Tracker] --> TSK-015
-TSK-012[TSK-012: Contacts CRM] --> TSK-015
+CAT-007[CAT-007: Pomodoro Timer] --> CAT-015[CAT-015: Smoke Testing]
+CAT-011[CAT-011: Mood Tracker] --> CAT-015
+CAT-012[CAT-012: Contacts CRM] --> CAT-015
 
 %% Dependent Plugins to Smoke Testing
-TSK-005 --> TSK-015
-TSK-006 --> TSK-015
-TSK-008 --> TSK-015
-TSK-009 --> TSK-015
-TSK-010 --> TSK-015
-TSK-013 --> TSK-015
-TSK-014 --> TSK-015
+CAT-005 --> CAT-015
+CAT-006 --> CAT-015
+CAT-008 --> CAT-015
+CAT-009 --> CAT-015
+CAT-010 --> CAT-015
+CAT-013 --> CAT-015
+CAT-014 --> CAT-015
 
-style TSK-001 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
-style TSK-002 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
-style TSK-003 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
-style TSK-004 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
-style TSK-015 fill:#eab308,stroke:#a16207,stroke-width:2px,color:#fff
+style CAT-001 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+style CAT-002 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+style CAT-003 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+style CAT-004 fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff
+style CAT-015 fill:#eab308,stroke:#a16207,stroke-width:2px,color:#fff
 ```
 
 ---
 
 ## 3. Critical Path & Graph Analysis
 
-* **Critical Path:** `TSK-004` (Biometric Key Release & Auto-Relock) $\rightarrow$ `TSK-008` (Linked Notes / Knowledge Graph) $\rightarrow$ `TSK-015` (Integration Smoke Testing)
+* **Critical Path:** `CAT-004` (Biometric Key Release & Auto-Relock) $\rightarrow$ `CAT-008` (Linked Notes / Knowledge Graph) $\rightarrow$ `CAT-015` (Integration Smoke Testing)
 * **Total Weighted Duration:** **132.08 weighted hours** (approx. 44 actual development hours).
-* **Shortest Path (Least Resistance to Integration):** `TSK-011` (Mood Tracker) $\rightarrow$ `TSK-015` (Integration Smoke Testing) = **33.00 weighted hours**.
+* **Shortest Path (Least Resistance to Integration):** `CAT-011` (Mood Tracker) $\rightarrow$ `CAT-015` (Integration Smoke Testing) = **33.00 weighted hours**.
 
 ### 3.1 Parallel Tracks & Float (Slack)
 
-* **Data Broker Track (TSK-001 $\rightarrow$ TSK-005/006/010):** Max path weight is 60.84. This track has a float of **47.84 weighted hours** relative to the critical path.
-* **RSS Track (TSK-002 $\rightarrow$ TSK-014):** Path weight is 73.20. This track has a float of **35.48 weighted hours**.
-* **Clipboard Track (TSK-003 $\rightarrow$ TSK-013):** Path weight is 43.92. This track has a float of **64.76 weighted hours**.
-* **Completely Independent Plugins (TSK-007, TSK-011, TSK-012):** These can be built at any time during the construction phase, offering massive parallelization opportunities for a multi-developer team.
+* **Data Broker Track (CAT-001 $\rightarrow$ CAT-005/006/010):** Max path weight is 60.84. This track has a float of **47.84 weighted hours** relative to the critical path.
+* **RSS Track (CAT-002 $\rightarrow$ CAT-014):** Path weight is 73.20. This track has a float of **35.48 weighted hours**.
+* **Clipboard Track (CAT-003 $\rightarrow$ CAT-013):** Path weight is 43.92. This track has a float of **64.76 weighted hours**.
+* **Completely Independent Plugins (CAT-007, CAT-011, CAT-012):** These can be built at any time during the construction phase, offering massive parallelization opportunities for a multi-developer team.
 
 ### 3.2 Bottleneck Nodes
 
-* **TSK-004 (Biometric Key Release & Auto-Relock):** High weight (49.28) and out-degree of 2. It blocks both the Linked Notes and Password Vault plugins.
-* **TSK-001 (Data Broker API Extension):** Out-degree of 3. It blocks the Calendar, Kanban, and Budget plugins.
-* **TSK-015 (Integration Smoke Testing):** In-degree of 10. This is the final convergence gate where all plugins must be verified.
+* **CAT-004 (Biometric Key Release & Auto-Relock):** High weight (49.28) and out-degree of 2. It blocks both the Linked Notes and Password Vault plugins.
+* **CAT-001 (Data Broker API Extension):** Out-degree of 3. It blocks the Calendar, Kanban, and Budget plugins.
+* **CAT-015 (Integration Smoke Testing):** In-degree of 10. This is the final convergence gate where all plugins must be verified.
 
 ---
 
@@ -136,7 +136,7 @@ The expansion introduces new files and modifies existing core files within the w
 
 ## 5. Data Flow Diagrams
 
-### 5.1 Host-Mediated RSS Background Fetch (TSK-002 $\rightarrow$ TSK-014)
+### 5.1 Host-Mediated RSS Background Fetch (CAT-002 $\rightarrow$ CAT-014)
 
 ```mermaid
 sequenceDiagram
@@ -160,7 +160,7 @@ sequenceDiagram
     Host-->>Plugin: postMessage(feed_data)
 ```
 
-### 5.2 Host-Active Clipboard Streaming (TSK-003 $\rightarrow$ TSK-013)
+### 5.2 Host-Active Clipboard Streaming (CAT-003 $\rightarrow$ CAT-013)
 
 ```mermaid
 sequenceDiagram
@@ -178,7 +178,7 @@ sequenceDiagram
     Note over Plugin: Display active streaming notice to user
 ```
 
-### 5.3 Independent Biometric Gate & Auto-Relock (TSK-004 $\rightarrow$ TSK-008/009)
+### 5.3 Independent Biometric Gate & Auto-Relock (CAT-004 $\rightarrow$ CAT-008/009)
 
 ```mermaid
 sequenceDiagram
@@ -212,7 +212,7 @@ sequenceDiagram
 
 ### 3.1 Host-Level Services (🔵 Inception Phase)
 
-#### `TSK-001`: Data Broker API Extension (JSON Schema Validation)
+#### `CAT-001`: Data Broker API Extension (JSON Schema Validation)
 
 * **Estimated Hours:** 12.0 | **Complexity:** 1.8 | **Risk:** 1.3 | **Weight:** 28.08
 * **Module:** `src-tauri/src/ipc.rs`
@@ -231,7 +231,7 @@ sequenceDiagram
   * [ ] Malformed payloads are rejected immediately with a `400 Bad Request` equivalent IPC error.
   * [ ] Authorized, valid queries successfully return read-only datasets to the requesting plugin.
 
-#### `TSK-002`: Host-Mediated RSS Background Fetch Service
+#### `CAT-002`: Host-Mediated RSS Background Fetch Service
 
 * **Estimated Hours:** 16.0 | **Complexity:** 2.0 | **Risk:** 1.5 | **Weight:** 48.00
 * **Module:** `src-tauri/src/rss.rs`
@@ -250,7 +250,7 @@ sequenceDiagram
   * [ ] Feeds are fetched, parsed, and written to the encrypted SQLCipher partition without blocking the main thread.
   * [ ] The RSS Reader plugin can read the data from its partition without making outbound network requests.
 
-#### `TSK-003`: Host-Active Clipboard Streaming Service
+#### `CAT-003`: Host-Active Clipboard Streaming Service
 
 * **Estimated Hours:** 10.0 | **Complexity:** 1.8 | **Risk:** 1.4 | **Weight:** 25.20
 * **Module:** `src-tauri/src/clipboard.rs`
@@ -269,7 +269,7 @@ sequenceDiagram
   * [ ] Changes are streamed to the frontend only if the active plugin has the `clipboard:subscribe` permission.
   * [ ] A clear, non-intrusive visual notice is displayed to the user when clipboard streaming is active.
 
-#### `TSK-004`: Independent Biometric Challenge & Auto-Relock
+#### `CAT-004`: Independent Biometric Challenge & Auto-Relock
 
 * **Estimated Hours:** 14.0 | **Complexity:** 2.2 | **Risk:** 1.6 | **Weight:** 49.28
 * **Module:** `src-tauri/src/biometrics.rs`
@@ -292,23 +292,23 @@ sequenceDiagram
 
 ### 3.2 Plugin Implementation (🟢 Construction Phase)
 
-#### `TSK-005`: Calendar / Scheduler Plugin
+#### `CAT-005`: Calendar / Scheduler Plugin
 
 * **Estimated Hours:** 14.0 | **Complexity:** 1.8 | **Risk:** 1.3 | **Weight:** 32.76
 * **Module:** `plugins/calendar/`
-* **Dependencies:** `TSK-001`
+* **Dependencies:** `CAT-001`
 * **Objective:** Build a calendar interface that aggregates tasks and goals from other plugins using the Data Broker's read-only query API.
 * **Technical Approach:** Use the extended SDK to query `todo:get_tasks` and `goals:get_milestones`. Render them on a responsive monthly/weekly calendar grid built with Tailwind CSS and shadcn/ui.
 
-#### `TSK-006`: Kanban / Project Board Plugin
+#### `CAT-006`: Kanban / Project Board Plugin
 
 * **Estimated Hours:** 14.0 | **Complexity:** 1.6 | **Risk:** 1.2 | **Weight:** 26.88
 * **Module:** `plugins/kanban/`
-* **Dependencies:** `TSK-001`
+* **Dependencies:** `CAT-001`
 * **Objective:** Build a visual Kanban board that shares the `todo` namespace.
 * **Technical Approach:** Implement drag-and-drop columns (Todo, In Progress, Done) using `@hello-pangea/dnd` or similar. Read and write tasks directly to the shared `todo` namespace via the Data Broker.
 
-#### `TSK-007`: Pomodoro / Focus Timer Plugin
+#### `CAT-007`: Pomodoro / Focus Timer Plugin
 
 * **Estimated Hours:** 8.0 | **Complexity:** 1.3 | **Risk:** 1.0 | **Weight:** 10.40
 * **Module:** `plugins/pomodoro/`
@@ -316,31 +316,31 @@ sequenceDiagram
 * **Objective:** Build a lightweight, self-contained focus timer.
 * **Technical Approach:** Implement a standard Pomodoro timer with customizable intervals. Broadcast session completion events to the Data Broker for other plugins to optionally consume.
 
-#### `TSK-008`: Linked Notes / Knowledge Graph Plugin
+#### `CAT-008`: Linked Notes / Knowledge Graph Plugin
 
 * **Estimated Hours:** 18.0 | **Complexity:** 2.2 | **Risk:** 1.5 | **Weight:** 59.40
 * **Module:** `plugins/notes/`
-* **Dependencies:** `TSK-004`
+* **Dependencies:** `CAT-004`
 * **Objective:** Build an Obsidian-style markdown note-taking tool with backlinking and an animated SVG knowledge graph view.
 * **Technical Approach:** Implement markdown parsing and backlink indexing. Render the knowledge graph using a force-directed layout in SVG/D3. Ensure the plugin triggers the biometric challenge on load and the relock command on unmount.
 
-#### `TSK-009`: Password / Secrets Vault Plugin
+#### `CAT-009`: Password / Secrets Vault Plugin
 
 * **Estimated Hours:** 10.0 | **Complexity:** 1.8 | **Risk:** 1.6 | **Weight:** 28.80
 * **Module:** `plugins/vault/`
-* **Dependencies:** `TSK-004`
+* **Dependencies:** `CAT-004`
 * **Objective:** Build a secure credential and secrets manager.
 * **Technical Approach:** Implement secure password generation, category filtering, and search. Enforce strict clipboard write-only permissions via the Data Broker. Ensure biometric challenge on load and immediate relock on unmount.
 
-#### `TSK-010`: Budget / Expense Tracker Plugin
+#### `CAT-010`: Budget / Expense Tracker Plugin
 
 * **Estimated Hours:** 12.0 | **Complexity:** 1.5 | **Risk:** 1.2 | **Weight:** 21.60
 * **Module:** `plugins/budget/`
-* **Dependencies:** `TSK-001`
+* **Dependencies:** `CAT-001`
 * **Objective:** Build a personal finance tracker that links spending limits to savings goals.
 * **Technical Approach:** Implement expense logging and category budgeting. Query the Goals Tracker plugin via the Data Broker to display progress toward linked savings goals.
 
-#### `TSK-011`: Mood / Wellness Tracker Plugin
+#### `CAT-011`: Mood / Wellness Tracker Plugin
 
 * **Estimated Hours:** 8.0 | **Complexity:** 1.2 | **Risk:** 1.0 | **Weight:** 9.60
 * **Module:** `plugins/mood/`
@@ -348,7 +348,7 @@ sequenceDiagram
 * **Objective:** Build a self-contained daily wellness check-in tool.
 * **Technical Approach:** Create a clean, visual interface for logging mood, sleep, and energy levels. Persist data locally within its isolated SQLCipher partition.
 
-#### `TSK-012`: Contacts / Mini-CRM Plugin
+#### `CAT-012`: Contacts / Mini-CRM Plugin
 
 * **Estimated Hours:** 10.0 | **Complexity:** 1.4 | **Risk:** 1.0 | **Weight:** 14.00
 * **Module:** `plugins/contacts/`
@@ -356,19 +356,19 @@ sequenceDiagram
 * **Objective:** Build a lightweight contact and relationship manager.
 * **Technical Approach:** Implement contact CRUD, tagging, and interaction logging. Persist data locally within its isolated SQLCipher partition.
 
-#### `TSK-013`: Clipboard Manager / Snippet Vault Plugin
+#### `CAT-013`: Clipboard Manager / Snippet Vault Plugin
 
 * **Estimated Hours:** 9.0 | **Complexity:** 1.6 | **Risk:** 1.3 | **Weight:** 18.72
 * **Module:** `plugins/clipboard/`
-* **Dependencies:** `TSK-003`
+* **Dependencies:** `CAT-003`
 * **Objective:** Build a clipboard history tracker and text snippet manager.
 * **Technical Approach:** Subscribe to the host's clipboard stream. Display a persistent, non-intrusive notice to the user that clipboard monitoring is active. Store history securely in SQLCipher.
 
-#### `TSK-014`: Read-It-Later / RSS Reader Plugin
+#### `CAT-014`: Read-It-Later / RSS Reader Plugin
 
 * **Estimated Hours:** 10.0 | **Complexity:** 1.4 | **Risk:** 1.8 | **Weight:** 25.20
 * **Module:** `plugins/rss/`
-* **Dependencies:** `TSK-002`
+* **Dependencies:** `CAT-002`
 * **Objective:** Build an offline-first RSS feed aggregator and article reader.
 * **Technical Approach:** Read pre-fetched feed data from the local SQLCipher partition. Render articles in a clean, distraction-free reader view. No outbound network requests are made by the plugin.
 
@@ -376,11 +376,11 @@ sequenceDiagram
 
 ### 3.3 Integration & Verification (🟡 Operations Phase)
 
-#### `TSK-015`: Integration Smoke Testing & Verification
+#### `CAT-015`: Integration Smoke Testing & Verification
 
 * **Estimated Hours:** 12.0 | **Complexity:** 1.5 | **Risk:** 1.3 | **Weight:** 23.40
 * **Module:** Entire Workspace
-* **Dependencies:** All Plugins (`TSK-005` through `TSK-014`)
+* **Dependencies:** All Plugins (`CAT-005` through `CAT-014`)
 * **Objective:** Conduct comprehensive integration testing, security audits, and performance verification of the entire expanded plugin catalog.
 * **Technical Approach:**
   * Verify that all 10 plugins load correctly within their sandboxed iframes.
@@ -404,7 +404,7 @@ sequenceDiagram
 ### Phase 1: Host-Level Services (🔵 Inception Phase)
 
 * **Focus:** Data Broker API Extension, RSS Background Fetcher, Clipboard Streamer, Biometric Gate & Auto-Relock.
-* **Tasks:** `TSK-001`, `TSK-002`, `TSK-003`, `TSK-004`
+* **Tasks:** `CAT-001`, `CAT-002`, `CAT-003`, `CAT-004`
 * **HITL Gate 1:**
   * `cargo check` returns 0 errors.
   * `cargo clippy -D warnings` returns 0 warnings.
@@ -414,7 +414,7 @@ sequenceDiagram
 ### Phase 2: Plugin Implementation (🟢 Construction Phase)
 
 * **Focus:** Build all 10 expansion plugins using the Core Plugin SDK.
-* **Tasks:** `TSK-005` through `TSK-014`
+* **Tasks:** `CAT-005` through `CAT-014`
 * **HITL Gate 2:**
   * TypeScript typecheck passes for all plugins.
   * ESLint returns 0 errors across the `plugins/` workspace.
@@ -423,7 +423,7 @@ sequenceDiagram
 ### Phase 3: Integration & Verification (🟡 Operations Phase)
 
 * **Focus:** Integration smoke testing, security auditing, and performance verification.
-* **Tasks:** `TSK-015`
+* **Tasks:** `CAT-015`
 * **HITL Gate 3:**
   * All 10 plugins load, render, and function correctly within their sandboxed iframes.
   * Security audit confirms zero plaintext leaks and strict sandbox isolation.

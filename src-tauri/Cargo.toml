@@ -29,3 +29,12 @@ windows = { version = "0.52", features = ["Foundation", "Security_Credentials_UI
 keyring = "2"
 zeroize = { version = "1.5", features = ["alloc"] }
 zip = "2"
+sha2 = "0.10"
+jsonschema = "0.33.0"
+tokio = { version = "1.53.1", features = ["full"] }
+feed-rs = "2.4.0"
+reqwest = { version = "0.13.3", features = ["json", "rustls"] }
+chrono = "0.4.45"
+
+[dev-dependencies]
+mockito = "1.7.2"

@@ -3,6 +3,10 @@ mod commands;
 mod database;
 mod ipc;
 mod protocol;
+mod rss;
+
+#[cfg(test)]
+mod tests;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -35,7 +39,15 @@ pub fn run() {
             commands::install_plugin,
             commands::list_plugins,
             commands::uninstall_plugin,
-            commands::seed_builtin_plugins
+            commands::seed_builtin_plugins,
+            commands::rss_add_feed,
+            commands::rss_refresh_feed,
+            commands::rss_refresh_all_feeds,
+            commands::rss_list_feeds,
+            commands::rss_list_items,
+            commands::rss_mark_item_read,
+            commands::rss_mark_item_starred,
+            commands::rss_delete_feed
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

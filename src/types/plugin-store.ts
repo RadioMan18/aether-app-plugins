@@ -11,6 +11,8 @@ export interface StoreItem {
   permissions: string[];
   installed: boolean;
   updateAvailable: boolean;
+  downloadUrl: string;
+  checksum: string;
   changelog?: string;
 }
 

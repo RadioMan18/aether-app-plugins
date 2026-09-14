@@ -14,6 +14,8 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["db:read", "db:write"],
     installed: true,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "todo",
@@ -29,6 +31,8 @@ export const STORE_ITEMS: StoreItem[] = [
     installed: true,
     updateAvailable: true,
     changelog: "Added recurring tasks and filter presets.",
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "goals",
@@ -40,9 +44,11 @@ export const STORE_ITEMS: StoreItem[] = [
     rating: 4.5,
     downloads: 760,
     author: "Aether",
-    permissions: ["db:read"],
+    permissions: ["db:read", "db:write"],
     installed: true,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "calendar-sync",
@@ -57,6 +63,8 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["network:outbound"],
     installed: false,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "secure-notes",
@@ -71,6 +79,8 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["biometric:read", "db:read", "db:write"],
     installed: false,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "dev-snippets",
@@ -85,6 +95,8 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["db:read", "db:write"],
     installed: false,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "focus-timer",
@@ -99,6 +111,8 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["notification:send"],
     installed: false,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "api-inspector",
@@ -113,6 +127,8 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["ipc:inspect"],
     installed: false,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "backup-tool",
@@ -128,6 +144,8 @@ export const STORE_ITEMS: StoreItem[] = [
     installed: false,
     updateAvailable: true,
     changelog: "Added cloud provider support.",
+    downloadUrl: "",
+    checksum: "",
   },
   {
     id: "webhook-relay",
@@ -142,5 +160,7 @@ export const STORE_ITEMS: StoreItem[] = [
     permissions: ["network:outbound"],
     installed: false,
     updateAvailable: false,
+    downloadUrl: "",
+    checksum: "",
   },
 ];

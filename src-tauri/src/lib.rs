@@ -1,10 +1,13 @@
 mod biometrics;
+mod clipboard;
 mod commands;
 mod database;
 mod ipc;
 mod protocol;
 mod rss;
 
+#[cfg(test)]
+mod clipboard_tests;
 #[cfg(test)]
 mod tests;
 
@@ -40,6 +43,8 @@ pub fn run() {
             commands::list_plugins,
             commands::uninstall_plugin,
             commands::seed_builtin_plugins,
+            commands::start_clipboard_streaming,
+            commands::set_active_clipboard_plugin,
             commands::rss_add_feed,
             commands::rss_refresh_feed,
             commands::rss_refresh_all_feeds,

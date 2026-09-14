@@ -188,17 +188,30 @@ Use native Tauri clipboard APIs or a specialized crate (e.g., clipboard-master) 
 
 - `src-tauri/src/clipboard.rs`
 - `src-tauri/src/ipc.rs`
+- `src-tauri/src/commands.rs`
+- `src-tauri/src/lib.rs`
 - `src-tauri/tests/clipboard_tests.rs`
+- `src/App.tsx`
+- `src/components/Shell/StatusBar.tsx`
 
 **Acceptance Criteria:**
 
-- [ ] Host successfully detects clipboard changes and filters out non-text/HTML data.
-- [ ] Changes are streamed to the frontend only if the active plugin has the clipboard:subscribe permission.
-- [ ] A clear, non-intrusive visual notice is displayed to the user when clipboard streaming is active.
+- [x] Host successfully detects clipboard changes and filters out non-text/HTML data.
+- [x] Changes are streamed to the frontend only if the active plugin has the clipboard:subscribe permission.
+- [x] A clear, non-intrusive visual notice is displayed to the user when clipboard streaming is active.
 
 **Testing Requirements:**
 
-Write unit tests in src-tauri/tests/clipboard_tests.rs to mock clipboard events and verify that only text/HTML data is propagated. Verify that permission checks correctly block unauthorized subscribers.
+Write unit tests in `src-tauri/src/clipboard_tests.rs` to verify filtering logic, permission checks, and payload serialization.
+
+**Implementation Notes:**
+
+- Added `clipboard.rs` with `ClipboardService` that polls the Windows clipboard via `OpenClipboard`/`GetClipboardData` in a background thread.
+- Filters for plain text only; binary and non-text formats are ignored.
+- Checks active plugin permissions via `db.get_plugin_permissions` before emitting `clipboard:changed` events.
+- Added `start_clipboard_streaming` and `set_active_clipboard_plugin` Tauri commands.
+- Added `clipboard:subscribe` to the IPC permission gate in `ipc.rs`.
+- Frontend listens for `clipboard:changed` and displays a streaming notice in the status bar when active.
 
 **Integration Notes:**
 

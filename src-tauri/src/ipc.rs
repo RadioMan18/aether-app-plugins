@@ -340,6 +340,7 @@ fn required_permission(request_type: &str) -> &'static str {
         "db:execute" => "db:write",
         "todo:get_tasks" => "db:read",
         "goals:get_milestones" => "db:read",
+        "clipboard:subscribe" => "clipboard:subscribe",
         _ => "unknown",
     }
 }

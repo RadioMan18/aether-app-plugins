@@ -1,10 +1,12 @@
 use crate::biometrics::{BiometricAuth, BiometricResult};
+use crate::clipboard::ClipboardService;
 use crate::database::{Database, PluginInfo};
 use crate::ipc::{PluginBroker, PluginRequest, PluginResponse};
 use crate::rss::{Feed, FeedItem, RssService};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
 use tauri::AppHandle;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -293,6 +295,30 @@ pub fn seed_builtin_plugins(app: AppHandle) -> Result<(), String> {
         db.register_plugin(id, name, version, &permissions)?;
     }
 
+    Ok(())
+}
+
+static CLIPBOARD_SERVICE: Mutex<Option<Arc<ClipboardService>>> = Mutex::new(None);
+
+#[tauri::command]
+pub fn start_clipboard_streaming(app: AppHandle) -> Result<(), String> {
+    let mut guard = CLIPBOARD_SERVICE.lock().unwrap();
+    if guard.is_some() {
+        return Ok(());
+    }
+    let app_data_dir = get_app_data_dir(&app)?;
+    let service = ClipboardService::new(app);
+    service.start(app_data_dir);
+    *guard = Some(Arc::new(service));
+    Ok(())
+}
+
+#[tauri::command]
+pub fn set_active_clipboard_plugin(plugin_id: Option<String>) -> Result<(), String> {
+    let guard = CLIPBOARD_SERVICE.lock().unwrap();
+    if let Some(service) = guard.as_ref() {
+        service.set_active_plugin(plugin_id);
+    }
     Ok(())
 }
 

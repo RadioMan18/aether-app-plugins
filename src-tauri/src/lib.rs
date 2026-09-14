@@ -7,6 +7,8 @@ mod protocol;
 mod rss;
 
 #[cfg(test)]
+mod biometrics_tests;
+#[cfg(test)]
 mod clipboard_tests;
 #[cfg(test)]
 mod tests;
@@ -37,6 +39,8 @@ pub fn run() {
             commands::unlock_database,
             commands::get_database_info,
             commands::invoke_biometric_challenge,
+            commands::unlock_partition,
+            commands::lock_partition,
             commands::register_plugin,
             commands::plugin_ipc,
             commands::install_plugin,

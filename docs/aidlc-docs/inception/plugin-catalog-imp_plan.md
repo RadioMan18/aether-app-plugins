@@ -244,13 +244,24 @@ Extend biometrics.rs to support independent, named biometric challenges via Wind
 
 **Acceptance Criteria:**
 
-- [ ] Opening Linked Notes or Password Vault triggers a dedicated Windows Hello prompt.
-- [ ] Navigating away from the plugin immediately triggers the lock_partition command.
-- [ ] Memory inspection confirms the partition key is zeroized and the database connection is closed/invalidated upon relock.
+- [x] Opening Linked Notes or Password Vault triggers a dedicated Windows Hello prompt.
+- [x] Navigating away from the plugin immediately triggers the lock_partition command.
+- [x] Memory inspection confirms the partition key is zeroized and the database connection is closed/invalidated upon relock.
 
 **Testing Requirements:**
 
-Write unit tests in src-tauri/tests/biometrics_tests.rs to verify that the zeroize crate successfully clears memory buffers. Mock the Windows Hello API to test success and failure flows.
+Write unit tests in `src-tauri/tests/biometrics_tests.rs` to verify that the zeroize crate successfully clears memory buffers. Mock the Windows Hello API to test success and failure flows.
+
+**Implementation Notes:**
+
+- Added `PartitionKey` wrapper using `zeroize::Zeroizing<String>` to hold encryption keys in memory.
+- Added `Partition` struct with `lock`, `is_locked`, and `with_connection` methods.
+- Added `PartitionManager` singleton (`OnceLock`) that tracks open partitions by name.
+- Extended `CredentialManager` with `store_partition_key` and `retrieve_partition_key` using per-partition usernames.
+- Extended `BiometricAuth` with `invoke_named_challenge` and `unlock_partition` methods.
+- Added `unlock_partition` and `lock_partition` Tauri commands.
+- Registered new commands and `biometrics_tests` module in `lib.rs`.
+- Created `biometrics_tests.rs` with tests for partition open/lock, manager dedup, and credential manager round-trip.
 
 **Integration Notes:**
 

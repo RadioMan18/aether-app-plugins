@@ -1,7 +1,8 @@
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex, OnceLock};
 use zeroize::Zeroize;
 
 pub struct Database {
@@ -231,14 +232,130 @@ impl Database {
     }
 }
 
-struct CredentialManager;
+pub struct PartitionKey(zeroize::Zeroizing<String>);
+
+impl PartitionKey {
+    pub fn new(key: String) -> Self {
+        Self(zeroize::Zeroizing::new(key))
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+pub struct Partition {
+    name: String,
+    key: Option<PartitionKey>,
+    conn: Option<Mutex<rusqlite::Connection>>,
+    db_path: PathBuf,
+}
+
+impl Partition {
+    pub fn open(name: &str, db_path: PathBuf) -> Result<Self, String> {
+        let key = CredentialManager::retrieve_partition_key(name)?;
+        let key_for_pragma = key.clone();
+
+        if let Some(parent) = db_path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| format!("Failed to create partition directory: {}", e))?;
+        }
+
+        let conn = rusqlite::Connection::open(&db_path)
+            .map_err(|e| format!("Failed to open partition database: {}", e))?;
+
+        conn.execute_batch(&format!("PRAGMA key = '{}';", key_for_pragma))
+            .map_err(|e| format!("Failed to set partition encryption key: {}", e))?;
+
+        conn.query_row("SELECT count(*) FROM sqlite_master", [], |_row| Ok(()))
+            .map_err(|e| format!("Failed to open encrypted partition: {}", e))?;
+
+        Ok(Self {
+            name: name.to_string(),
+            key: Some(PartitionKey::new(key)),
+            conn: Some(Mutex::new(conn)),
+            db_path,
+        })
+    }
+
+    pub fn lock(&mut self) {
+        self.conn = None;
+        self.key = None;
+    }
+
+    pub fn is_locked(&self) -> bool {
+        self.conn.is_none()
+    }
+
+    pub fn with_connection<F, R>(&self, f: F) -> Result<R, String>
+    where
+        F: FnOnce(&rusqlite::Connection) -> Result<R, String>,
+    {
+        let conn = self
+            .conn
+            .as_ref()
+            .ok_or("Partition is locked")?
+            .lock()
+            .map_err(|e| format!("Failed to acquire partition lock: {}", e))?;
+        f(&conn)
+    }
+}
+
+pub struct PartitionManager {
+    partitions: Mutex<HashMap<String, Arc<Mutex<Partition>>>>,
+}
+
+impl PartitionManager {
+    pub fn global() -> &'static Self {
+        static INSTANCE: OnceLock<PartitionManager> = OnceLock::new();
+        INSTANCE.get_or_init(|| Self {
+            partitions: Mutex::new(HashMap::new()),
+        })
+    }
+
+    pub fn get_or_open(
+        &self,
+        name: &str,
+        app_data_dir: PathBuf,
+    ) -> Result<Arc<Mutex<Partition>>, String> {
+        let mut partitions = self.partitions.lock().unwrap();
+        if let Some(partition) = partitions.get(name) {
+            return Ok(partition.clone());
+        }
+
+        let db_path = app_data_dir.join("plugins").join(name).join("data.db");
+        let partition = Partition::open(name, db_path)?;
+        let arc = Arc::new(Mutex::new(partition));
+        partitions.insert(name.to_string(), arc.clone());
+        Ok(arc)
+    }
+
+    pub fn lock(&self, name: &str) -> Result<(), String> {
+        let partitions = self.partitions.lock().unwrap();
+        if let Some(partition) = partitions.get(name) {
+            let mut p = partition.lock().unwrap();
+            p.lock();
+        }
+        Ok(())
+    }
+
+    pub fn is_locked(&self, name: &str) -> bool {
+        let partitions = self.partitions.lock().unwrap();
+        partitions.get(name).map_or(true, |p| {
+            let p = p.lock().unwrap();
+            p.is_locked()
+        })
+    }
+}
+
+pub struct CredentialManager;
 
 impl CredentialManager {
     const SERVICE: &'static str = "aether-app-suite";
-    const USERNAME: &'static str = "db-encryption-key";
+    const MAIN_USERNAME: &'static str = "db-encryption-key";
 
-    fn store_key(key: &str) -> Result<(), String> {
-        let entry = keyring::Entry::new(Self::SERVICE, Self::USERNAME)
+    pub fn store_key(key: &str) -> Result<(), String> {
+        let entry = keyring::Entry::new(Self::SERVICE, Self::MAIN_USERNAME)
             .map_err(|e| format!("Failed to create credential manager entry: {}", e))?;
         entry
             .set_password(key)
@@ -246,11 +363,28 @@ impl CredentialManager {
         Ok(())
     }
 
-    fn retrieve_key() -> Result<String, String> {
-        let entry = keyring::Entry::new(Self::SERVICE, Self::USERNAME)
+    pub fn retrieve_key() -> Result<String, String> {
+        let entry = keyring::Entry::new(Self::SERVICE, Self::MAIN_USERNAME)
             .map_err(|e| format!("Failed to create credential manager entry: {}", e))?;
         entry
             .get_password()
             .map_err(|e| format!("Failed to retrieve encryption key: {}", e))
+    }
+
+    pub fn store_partition_key(partition: &str, key: &str) -> Result<(), String> {
+        let entry = keyring::Entry::new(Self::SERVICE, &format!("partition-{}-key", partition))
+            .map_err(|e| format!("Failed to create credential manager entry: {}", e))?;
+        entry
+            .set_password(key)
+            .map_err(|e| format!("Failed to store partition encryption key: {}", e))?;
+        Ok(())
+    }
+
+    pub fn retrieve_partition_key(partition: &str) -> Result<String, String> {
+        let entry = keyring::Entry::new(Self::SERVICE, &format!("partition-{}-key", partition))
+            .map_err(|e| format!("Failed to create credential manager entry: {}", e))?;
+        entry
+            .get_password()
+            .map_err(|e| format!("Failed to retrieve partition encryption key: {}", e))
     }
 }

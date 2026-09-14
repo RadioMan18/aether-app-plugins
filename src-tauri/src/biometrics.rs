@@ -1,4 +1,6 @@
+use crate::database::PartitionManager;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use windows::{
     core::HSTRING,
     Security::Credentials::UI::{
@@ -21,6 +23,20 @@ impl BiometricAuth {
     }
 
     pub async fn invoke_challenge(&self, message: &str) -> Result<BiometricResult, String> {
+        self.invoke_named_challenge("default", message).await
+    }
+
+    pub async fn invoke_named_challenge(
+        &self,
+        name: &str,
+        message: &str,
+    ) -> Result<BiometricResult, String> {
+        log::info!(
+            "Biometric challenge requested: name={}, message={}",
+            name,
+            message
+        );
+
         let availability = UserConsentVerifier::CheckAvailabilityAsync()
             .map_err(|e| format!("Failed to check biometric availability: {}", e))?
             .await
@@ -49,10 +65,25 @@ impl BiometricAuth {
             success,
             available: true,
             message: if success {
-                "Biometric verification successful".to_string()
+                format!("Biometric verification successful for '{}'", name)
             } else {
-                format!("Biometric verification failed: {:?}", result)
+                format!("Biometric verification failed for '{}': {:?}", name, result)
             },
         })
+    }
+
+    pub async fn unlock_partition(
+        &self,
+        name: &str,
+        message: &str,
+        app_data_dir: PathBuf,
+    ) -> Result<(), String> {
+        let result = self.invoke_named_challenge(name, message).await?;
+        if !result.success {
+            return Err(result.message);
+        }
+
+        PartitionManager::global().get_or_open(name, app_data_dir)?;
+        Ok(())
     }
 }

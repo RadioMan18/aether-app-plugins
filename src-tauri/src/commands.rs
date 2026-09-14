@@ -1,6 +1,6 @@
 use crate::biometrics::{BiometricAuth, BiometricResult};
 use crate::clipboard::ClipboardService;
-use crate::database::{Database, PluginInfo};
+use crate::database::{Database, PartitionManager, PluginInfo};
 use crate::ipc::{PluginBroker, PluginRequest, PluginResponse};
 use crate::rss::{Feed, FeedItem, RssService};
 use serde::{Deserialize, Serialize};
@@ -113,6 +113,18 @@ pub fn get_database_info(app: AppHandle) -> Result<Option<DatabaseInfo>, String>
 pub async fn invoke_biometric_challenge(message: String) -> Result<BiometricResult, String> {
     let auth = BiometricAuth::new();
     auth.invoke_challenge(&message).await
+}
+
+#[tauri::command]
+pub async fn unlock_partition(app: AppHandle, name: String, message: String) -> Result<(), String> {
+    let app_data_dir = get_app_data_dir(&app)?;
+    let auth = BiometricAuth::new();
+    auth.unlock_partition(&name, &message, app_data_dir).await
+}
+
+#[tauri::command]
+pub fn lock_partition(name: String) -> Result<(), String> {
+    PartitionManager::global().lock(&name)
 }
 
 #[tauri::command]

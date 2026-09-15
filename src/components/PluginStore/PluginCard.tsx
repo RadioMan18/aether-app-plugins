@@ -33,7 +33,7 @@ export function PluginCard({ item, onSelect, onInstall, onUninstall, isSelected 
         </div>
         <div className="flex items-center gap-1 text-xs text-text-secondary">
           <Star className="h-3 w-3 fill-warning text-warning" />
-          <span>{item.rating}</span>
+          <span>{(item.rating ?? 0).toFixed(1)}</span>
         </div>
       </div>
 
@@ -45,7 +45,7 @@ export function PluginCard({ item, onSelect, onInstall, onUninstall, isSelected 
             {item.category.replace("-", " ")}
           </Badge>
           <span className="text-xs text-text-muted">
-            {item.downloads.toLocaleString()} downloads
+            {(item.downloads ?? 0).toLocaleString()} downloads
           </span>
         </div>
 

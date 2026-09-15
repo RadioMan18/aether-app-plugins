@@ -11,7 +11,9 @@
       "author": "Aether",
       "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/journal.zip",
-      "checksum": "sha256:59e7a3449511d546d3aa7efdf915defdd2031b11fde4cef8bd752509aa6efe2e",
+      "checksum": "sha256:59e7a3449511d5468219b904e353fbd6c49dab8496dcea755c67f405bb590ed67",
+      "rating": 4.8,
+      "downloads": 1240,
       "changelog": "Initial plugin catalog release."
     },
     {
@@ -20,11 +22,13 @@
       "version": "0.1.0",
       "category": "productivity",
       "icon": "✅",
-      "description": "Task management with priorities, due dates, and Activity Bar integration.",
+      "description": "Task management with priorities, due dates, and completion tracking.",
       "author": "Aether",
       "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/todo.zip",
       "checksum": "sha256:5c305e18cd4a14eea1b77796e5bce96f8a753ac61ed7a8bb6db84274e9012b47",
+      "rating": 4.6,
+      "downloads": 980,
       "changelog": "Initial plugin catalog release."
     },
     {
@@ -38,6 +42,8 @@
       "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/goals.zip",
       "checksum": "sha256:e2d09131e93b7528219b904e353fbd6c49dab8496dcea755c67f405bb590ed67",
+      "rating": 4.5,
+      "downloads": 760,
       "changelog": "Initial plugin catalog release."
     },
     {
@@ -51,7 +57,26 @@
       "permissions": [],
       "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/pomodoro.zip",
       "checksum": "sha256:5795062f84ddeb94db5a34894e9b10151d0a42371c3233f8bc19ee344fa428aa",
+      "rating": 4.7,
+      "downloads": 1120,
+      "changelog": "Initial plugin catalog release."
+    },
+    {
+      "id": "mood",
+      "name": "Wellness",
+      "version": "0.1.0",
+      "category": "productivity",
+      "icon": "🧘",
+      "description": "Mood, weight, blood pressure, and glucose tracker with historical charts.",
+      "author": "Aether",
+      "permissions": ["db:read", "db:write"],
+      "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/mood.zip",
+      "checksum": "sha256:PLACEHOLDER",
+      "rating": 4.4,
+      "downloads": 540,
       "changelog": "Initial plugin catalog release."
     }
+  ]
+}
   ]
 }

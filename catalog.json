@@ -71,12 +71,10 @@
       "author": "Aether",
       "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/mood.zip",
-      "checksum": "sha256:PLACEHOLDER",
+      "checksum": "sha256:c8a3a4fc4e4dfd7a7862502804b1b9b8fd6ee49aa7abe31863fcf2eefc1aea07",
       "rating": 4.4,
       "downloads": 540,
       "changelog": "Initial plugin catalog release."
     }
-  ]
-}
   ]
 }

@@ -292,14 +292,10 @@ pub fn seed_builtin_plugins(app: AppHandle) -> Result<(), String> {
             vec!["db:read".to_string(), "db:write".to_string()],
         ),
         (
-            "rss",
-            "RSS Reader",
-            "0.1.0",
-            vec![
-                "db:read".to_string(),
-                "db:write".to_string(),
-                "network:outbound".to_string(),
-            ],
+            "plugin-store",
+            "Plugin Store",
+            "1.0.0",
+            vec![],
         ),
     ];
 

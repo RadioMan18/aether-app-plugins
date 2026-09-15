@@ -21,6 +21,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     ui: { activityBar: true, sidebarSection: "Journal" },
     permissions: ["db:read", "db:write"],
     sandboxed: true,
+    builtin: true,
   },
   {
     id: "todo",
@@ -30,6 +31,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     ui: { activityBar: true, sidebarSection: "Todo" },
     permissions: ["db:read", "db:write"],
     sandboxed: true,
+    builtin: true,
   },
   {
     id: "goals",
@@ -39,15 +41,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     ui: { activityBar: true, sidebarSection: "Goals" },
     permissions: ["db:read", "db:write"],
     sandboxed: true,
-  },
-  {
-    id: "rss",
-    name: "RSS Reader",
-    version: "0.1.0",
-    icon: "📰",
-    ui: { activityBar: true, sidebarSection: "RSS" },
-    permissions: ["db:read", "db:write", "network:outbound"],
-    sandboxed: true,
+    builtin: true,
   },
   {
     id: "plugin-store",
@@ -61,8 +55,13 @@ const MOCK_PLUGINS: PluginManifest[] = [
 
 function App() {
   const shell = useShellState(MOCK_PLUGINS);
-  const { catalogItems } = usePluginManager();
+  const { catalogItems, installedPlugins } = usePluginManager();
   const [clipboardStreaming, setClipboardStreaming] = useState(false);
+
+  const visiblePlugins = useMemo(() => {
+    const installedIds = new Set(installedPlugins.map((p) => p.id));
+    return MOCK_PLUGINS.filter((p) => p.builtin || installedIds.has(p.id));
+  }, [installedPlugins]);
 
   useEffect(() => {
     const seed = async () => {
@@ -91,18 +90,18 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const plugin = MOCK_PLUGINS.find((plugin) => plugin.id === shell.activePluginId);
+    const plugin = visiblePlugins.find((plugin) => plugin.id === shell.activePluginId);
     const hasPermission = plugin?.permissions?.includes("clipboard:subscribe") ?? false;
     invoke("set_active_clipboard_plugin", {
       pluginId: hasPermission ? shell.activePluginId : null,
     }).catch(() => {
       // ignore clipboard backend errors
     });
-  }, [shell.activePluginId]);
+  }, [shell.activePluginId, visiblePlugins]);
 
   const activePlugin = useMemo(
-    () => MOCK_PLUGINS.find((plugin) => plugin.id === shell.activePluginId) ?? null,
-    [shell.activePluginId]
+    () => visiblePlugins.find((plugin) => plugin.id === shell.activePluginId) ?? null,
+    [shell.activePluginId, visiblePlugins]
   );
 
   const storeItems = catalogItems.length > 0 ? catalogItems : [];
@@ -112,7 +111,7 @@ function App() {
       <CustomTitleBar />
       <div className="flex flex-1 overflow-hidden">
         <ActivityBar
-          plugins={MOCK_PLUGINS}
+          plugins={visiblePlugins}
           activePluginId={shell.activePluginId}
           onPluginSelect={shell.setActivePluginId}
         />
@@ -122,7 +121,7 @@ function App() {
           onToggle={shell.toggleSidebar}
           onPluginSelect={shell.setActivePluginId}
           activePluginId={shell.activePluginId}
-          plugins={MOCK_PLUGINS}
+          plugins={visiblePlugins}
         />
         {activePlugin?.id === "plugin-store" ? (
           <PluginStore items={storeItems} />

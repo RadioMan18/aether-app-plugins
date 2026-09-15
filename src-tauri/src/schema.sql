@@ -70,5 +70,40 @@ CREATE INDEX IF NOT EXISTS idx_rss_items_feed_id ON rss_items(feed_id);
 CREATE INDEX IF NOT EXISTS idx_rss_items_published_at ON rss_items(published_at);
 CREATE INDEX IF NOT EXISTS idx_rss_items_is_read ON rss_items(is_read);
 
+CREATE TABLE IF NOT EXISTS mood_entries (
+    id TEXT PRIMARY KEY NOT NULL,
+    mood INTEGER NOT NULL,
+    sleep_hours REAL NOT NULL,
+    energy_level INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS weight_entries (
+    id TEXT PRIMARY KEY NOT NULL,
+    weight_value REAL NOT NULL,
+    unit TEXT NOT NULL DEFAULT 'lbs',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS blood_pressure_entries (
+    id TEXT PRIMARY KEY NOT NULL,
+    systolic INTEGER NOT NULL,
+    diastolic INTEGER NOT NULL,
+    pulse INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS glucose_entries (
+    id TEXT PRIMARY KEY NOT NULL,
+    value REAL NOT NULL,
+    measured_at TEXT NOT NULL,
+    time_of_day TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 UPDATE journal_entries SET id = lower(hex(randomblob(16))) WHERE id IS NULL;
 UPDATE todos SET id = lower(hex(randomblob(16))) WHERE id IS NULL;

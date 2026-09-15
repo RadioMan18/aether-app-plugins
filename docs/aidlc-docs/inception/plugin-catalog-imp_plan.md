@@ -323,23 +323,39 @@ Build a self-contained daily wellness check-in tool.
 
 **Technical Approach:**
 
-Create a clean, visual interface for logging mood, sleep, and energy levels. Persist data locally within its isolated SQLCipher partition.
+Create a clean, visual interface for logging mood, sleep, energy levels, weight, blood pressure, and glucose. Persist data locally within its isolated SQLCipher partition. Render per-metric historical charts with Day, Week, and Month views.
+
+**Data Model:**
+
+Use separate tables per metric type:
+- `mood_entries` — mood, sleep hours, energy levels
+- `weight_entries` — weight value, unit (`lbs` or `kg`)
+- `blood_pressure_entries` — systolic, diastolic, pulse
+- `glucose_entries` — value, measurement datetime, time_of_day enum
 
 **Files to Create/Modify:**
 
 - `plugins/mood/src/index.tsx`
 - `plugins/mood/src/components/MoodSelector.tsx`
+- `plugins/mood/src/components/WeightEntry.tsx`
+- `plugins/mood/src/components/BloodPressureEntry.tsx`
+- `plugins/mood/src/components/GlucoseEntry.tsx`
+- `plugins/mood/src/components/WellnessCharts.tsx`
 - `plugins/mood/tests/mood.test.tsx`
 
 **Acceptance Criteria:**
 
 - [ ] Allows logging daily mood, sleep hours, and energy levels.
+- [ ] Allows logging weight in lbs or kg with a unit toggle, defaulting to lbs.
+- [ ] Allows logging blood pressure (systolic 60–250, diastolic 40–150) and pulse.
+- [ ] Allows logging glucose (20–600 mg/dL) with date/time and time-of-day dropdown: Out of Bed, Before Breakfast, After Breakfast, Before Lunch, After Lunch, Before Dinner, After Dinner, After Snack, Before Bed.
 - [ ] Persists data locally within its isolated SQLCipher partition.
-- [ ] Renders simple historical charts of mood trends.
+- [ ] Renders per-metric historical charts with Day, Week, and Month views.
+- [ ] User can edit past entries on a unified check-in screen.
 
 **Testing Requirements:**
 
-Write component tests to verify that mood selections are correctly saved to the local database. Test rendering of trend charts with mock historical data.
+Write component tests to verify that mood selections, weight, blood pressure, and glucose entries are correctly saved to the local database. Test rendering of trend charts with mock historical data for each metric type.
 
 **Integration Notes:**
 

@@ -50,6 +50,7 @@ const MOCK_PLUGINS: PluginManifest[] = [
     icon: "🧩",
     ui: { activityBar: true },
     permissions: [],
+    builtin: true,
   },
 ];
 

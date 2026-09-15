@@ -346,7 +346,7 @@ sequenceDiagram
 * **Module:** `plugins/mood/`
 * **Dependencies:** None
 * **Objective:** Build a self-contained daily wellness check-in tool.
-* **Technical Approach:** Create a clean, visual interface for logging mood, sleep, and energy levels. Persist data locally within its isolated SQLCipher partition.
+* **Technical Approach:** Create a clean, visual interface for logging mood, sleep, energy levels, weight, blood pressure, and glucose. Persist data locally within its isolated SQLCipher partition. Render per-metric historical charts with Day, Week, and Month views. Use separate tables per metric type: `mood_entries`, `weight_entries`, `blood_pressure_entries`, `glucose_entries`.
 
 #### `CAT-012`: Contacts / Mini-CRM Plugin
 

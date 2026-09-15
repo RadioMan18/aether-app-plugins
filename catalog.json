@@ -105,6 +105,19 @@
       "rating": 4.7,
       "downloads": 765,
       "changelog": "Initial plugin catalog release."
-    }
+    },
+    {
+  "id": "kanban",
+  "name": "Kanban Board",
+  "version": "0.1.0",
+  "category": "productivity",
+  "icon": "🎯",
+  "description": "Simple Kanban board plugin for managing tasks and workflows.",
+  "author": "Aether",
+  "permissions": ["db:read", "db:write"],
+  "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/kanban.zip",
+  "checksum": "sha256:121fbdc4239756cefb349c4a0044dab87cec5de32e93a51741577b4bfc115c9a",
+  "changelog": "Initial plugin catalog release."
+  }
   ]
 }

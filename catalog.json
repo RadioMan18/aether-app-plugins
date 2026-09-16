@@ -135,6 +135,21 @@
   "rating":4.8,
   "downloads": 875,
   "changelog": "Initial plugin catalog release."
+  },
+  {
+  "id": "rss",
+  "name": "RSS Reader",
+  "version": "0.1.0",
+  "category": "productivity",
+  "icon": "📓",
+  "description": "Simple RSS reader plugin for staying updated with your favorite feeds.",
+  "author": "Aether",
+  "permissions": ["db:read", "db:write"],
+  "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/RSS_v0.1.0/rss-0.1.0.zip",
+  "checksum": "sha256:7f90eb2919a2d2aa2528a1fc9d8345d44fc7d281a2e9fefba31f272d3e59720f",
+  "rating":4.6,
+  "downloads": 900,
+  "changelog": "Initial plugin catalog release."
   }
   ]
 }

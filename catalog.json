@@ -111,12 +111,29 @@
   "name": "Kanban Board",
   "version": "0.1.0",
   "category": "productivity",
-  "icon": "🎯",
+  "icon": "✅",
   "description": "Simple Kanban board plugin for managing tasks and workflows.",
   "author": "Aether",
   "permissions": ["db:read", "db:write"],
   "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/kanban.zip",
   "checksum": "sha256:121fbdc4239756cefb349c4a0044dab87cec5de32e93a51741577b4bfc115c9a",
+  "rating": 4.5,
+  "downloads": 430,
+  "changelog": "Initial plugin catalog release."
+  },
+  {
+  "id": "notes",
+  "name": "Notes",
+  "version": "0.1.0",
+  "category": "productivity",
+  "icon": "📓",
+  "description": "Simple notes plugin for capturing and organizing thoughts with added knowledge graph.",
+  "author": "Aether",
+  "permissions": ["db:read", "db:write"],
+  "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/notes.zip",
+  "checksum": "sha256:2e4ffc01865790d99b17a087ed14f42f7a8c6645468675b4917bad1e2c6ec3c6",
+  "rating":4.8,
+  "downloads": 875,
   "changelog": "Initial plugin catalog release."
   }
   ]

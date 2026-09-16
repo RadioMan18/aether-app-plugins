@@ -1,52 +1,7 @@
 {
   "catalogVersion": "1.0.0",
   "plugins": [
-    {
-      "id": "journal",
-      "name": "Journal",
-      "version": "0.1.0",
-      "category": "productivity",
-      "icon": "📓",
-      "description": "Encrypted journaling with native-feel UI, markdown support, and daily prompts.",
-      "author": "Aether",
-      "permissions": ["db:read", "db:write"],
-      "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/journal-0.1.0.zip",
-      "checksum": "sha256:59e7a3449511d5468219b904e353fbd6c49dab8496dcea755c67f405bb590ed67",
-      "rating": 4.8,
-      "downloads": 1240,
-      "changelog": "Initial plugin catalog release."
-    },
-    {
-      "id": "todo",
-      "name": "Todo List",
-      "version": "0.1.0",
-      "category": "productivity",
-      "icon": "✅",
-      "description": "Task management with priorities, due dates, and completion tracking.",
-      "author": "Aether",
-      "permissions": ["db:read", "db:write"],
-      "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/todo-0.1.0.zip",
-      "checksum": "sha256:5c305e18cd4a14eea1b77796e5bce96f8a753ac61ed7a8bb6db84274e9012b47",
-      "rating": 4.6,
-      "downloads": 980,
-      "changelog": "Initial plugin catalog release."
-    },
-    {
-      "id": "goals",
-      "name": "Goals",
-      "version": "0.1.0",
-      "category": "productivity",
-      "icon": "🎯",
-      "description": "Track long-term goals with milestones and cross-plugin progress sharing.",
-      "author": "Aether",
-      "permissions": ["db:read", "db:write"],
-      "downloadUrl": "https://github.com/RadioMan18/aether-app-plugins/releases/download/v0.1.0/goals-0.1.0.zip",
-      "checksum": "sha256:e2d09131e93b7528219b904e353fbd6c49dab8496dcea755c67f405bb590ed67",
-      "rating": 4.5,
-      "downloads": 760,
-      "changelog": "Initial plugin catalog release."
-    },
-    {
+      {
       "id": "pomodoro",
       "name": "Pomodoro Timer",
       "version": "0.1.0",

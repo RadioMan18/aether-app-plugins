@@ -1,4 +1,4 @@
-# Aether App Suite
+# Nidus
 
 A privacy-first, plugin-based desktop productivity suite built with Tauri, React, and SQLCipher.
 

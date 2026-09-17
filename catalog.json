@@ -1,7 +1,7 @@
 {
   "catalogVersion": "1.0.0",
   "plugins": [
-    {
+      {
       "id": "pomodoro",
       "name": "Pomodoro Timer",
       "version": "0.1.1",
@@ -62,49 +62,49 @@
       "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
     },
     {
-      "id": "kanban",
-      "name": "Kanban Board",
-      "version": "0.1.1",
-      "category": "productivity",
-      "icon": "📋",
-      "description": "Simple Kanban board plugin for managing tasks and workflows.",
-      "author": "Nidus",
-      "permissions": ["db:read", "db:write"],
+  "id": "kanban",
+  "name": "Kanban Board",
+  "version": "0.1.1",
+  "category": "productivity",
+  "icon": "📋",
+  "description": "Simple Kanban board plugin for managing tasks and workflows.",
+  "author": "Nidus",
+  "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/nidus-app-plugins/releases/download/Kanban_v0.1.1/kanban-0.1.0.zip",
       "checksum": "sha256:70e0c9b25991d9c98e963496418dab6f8a17fa7746bfdef0eb20d6788df78e0a",
-      "rating": 4.5,
-      "downloads": 430,
-      "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
-    },
-    {
-      "id": "notes",
-      "name": "Notes",
-      "version": "0.1.1",
-      "category": "productivity",
-      "icon": "📝",
-      "description": "Simple notes plugin for capturing and organizing thoughts with added knowledge graph.",
-      "author": "Nidus",
-      "permissions": ["db:read", "db:write"],
+  "rating": 4.5,
+  "downloads": 430,
+  "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
+  },
+  {
+  "id": "notes",
+  "name": "Notes",
+  "version": "0.1.1",
+  "category": "productivity",
+  "icon": "📝",
+  "description": "Simple notes plugin for capturing and organizing thoughts with added knowledge graph.",
+  "author": "Nidus",
+  "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/nidus-app-plugins/releases/download/Notes_v0.1.1/notes-0.1.0.zip",
       "checksum": "sha256:5e6bb2d0b04c86eb373c4fee5bb63ea20cb7b4d333732c0d10905d84d111cfe9",
-      "rating": 4.8,
-      "downloads": 875,
-      "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
-    },
-    {
-      "id": "rss",
-      "name": "RSS Reader",
-      "version": "0.1.1",
-      "category": "productivity",
-      "icon": "📰",
-      "description": "Simple RSS reader plugin for staying updated with your favorite feeds.",
-      "author": "Nidus",
-      "permissions": ["db:read", "db:write"],
+  "rating":4.8,
+  "downloads": 875,
+  "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
+  },
+  {
+  "id": "rss",
+  "name": "RSS Reader",
+  "version": "0.1.1",
+  "category": "productivity",
+  "icon": "📰",
+  "description": "Simple RSS reader plugin for staying updated with your favorite feeds.",
+  "author": "Nidus",
+  "permissions": ["db:read", "db:write"],
       "downloadUrl": "https://github.com/RadioMan18/nidus-app-plugins/releases/download/RSS_v0.1.1/rss-0.1.0.zip",
       "checksum": "sha256:db1aa46bd37a37dd5258a8727a3eff015584a6bf486d8ded7ebf098e9bd2e9f0",
-      "rating": 4.6,
-      "downloads": 900,
-      "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
-    }
+  "rating":4.6,
+  "downloads": 900,
+  "changelog": "Rebuilt with Nidus rebrand (IPC namespace update)."
+  }
   ]
 }
